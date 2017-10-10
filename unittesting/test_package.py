@@ -49,7 +49,7 @@ class UnitTestingCommand(sublime_plugin.ApplicationCommand, UnitTestingMixin):
         progress_bar.start()
 
         try:
-            # use custom loader which support ST2 and reloading modules
+            # use custom loader which supports reloading modules
             self.remove_test_modules(package, settings["tests_dir"])
             loader = TestLoader(settings["deferred"])
             tests = loader.discover(os.path.join(
@@ -87,6 +87,6 @@ class UnitTestingCommand(sublime_plugin.ApplicationCommand, UnitTestingMixin):
                         # remove stream set by logging.root.addHandler
                         logging.root.removeHandler(handler)
                 else:
-                    sublime.set_timeout(lambda: cleanup(status+1), 500)
+                    sublime.set_timeout(lambda: cleanup(status + 1), 500)
 
             cleanup()
