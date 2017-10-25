@@ -46,6 +46,8 @@ function Bootstrap {
 
         write-verbose "download UnitTesting tag: $UNITTESTING_TAG"
         git clone --quiet --depth 1 --branch=$UNITTESTING_TAG $UT_URL "$UT_PATH" 2>$null
+        git -C "$UT_PATH" rev-parse HEAD | write-verbose
+        write-verbose ""
     }
 
     $COV_PATH = "$STP\coverage"
@@ -64,6 +66,8 @@ function Bootstrap {
 
         write-verbose "download sublime-coverage tag: $COVERAGE_TAG"
         git clone --quiet --depth 1 --branch=$COVERAGE_TAG $COV_URL "$COV_PATH" 2>$null
+        git -C "$COV_PATH" rev-parse HEAD | write-verbose
+        write-verbose ""
     }
 
 
@@ -92,17 +96,22 @@ function InstallColorSchemeUnit {
         }
         write-verbose "download ColorSchemeUnit tag: $COLOR_SCHEME_UNIT_TAG"
         git clone --quiet --depth 1 --branch=$COLOR_SCHEME_UNIT_TAG $CSU_URL "$CSU_PATH" 2>$null
+        git -C "$CSU_PATH" rev-parse HEAD | write-verbose
+        write-verbose ""
     }
 }
 
 function RunTests {
     [CmdletBinding()]
     param(
-        [switch] $syntax_test
+        [switch] $syntax_test,
+        [switch] $color_scheme_test
     )
 
     if ( $syntax_test.IsPresent ){
         & "$STP\UnitTesting\sbin\run_tests.ps1" "${env:PACKAGE}" -verbose -syntax_test
+    } elseif ( $color_scheme_test.IsPresent ){
+        & "$STP\UnitTesting\sbin\run_tests.ps1" "${env:PACKAGE}" -verbose -color_scheme_test
     } elseif ( $coverage.IsPresent ) {
         & "$STP\UnitTesting\sbin\run_tests.ps1" "${env:PACKAGE}" -verbose -coverage
     } else {
@@ -117,6 +126,7 @@ try{
         "install_color_scheme_unit" { InstallColorSchemeUnit }
         "run_tests" { RunTests }
         "run_syntax_tests" { RunTests -syntax_test}
+        "run_color_scheme_tests" { RunTests -color_scheme_test}
     }
 }catch {
     throw $_

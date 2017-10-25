@@ -5,6 +5,7 @@ import re
 import sys
 import json
 import optparse
+import shutil
 
 # todo: allow different sublime versions
 
@@ -49,7 +50,7 @@ if not os.path.isdir(jpath_dir):
 try:
     with open(jpath, 'r') as f:
         schedule = json.load(f)
-except:
+except Exception:
     schedule = []
 if not any([s['package'] == package for s in schedule]):
     schedule_info = {
@@ -67,14 +68,15 @@ if not any([s['package'] == package for s in schedule]):
 with open(jpath, 'w') as f:
     f.write(json.dumps(schedule, ensure_ascii=False, indent=True))
 
-# launch scheduler
-tasks = subprocess.check_output(['ps', 'xw']).decode('utf8')
-sublime_is_running = "Sublime" in tasks or "sublime_text" in tasks
+# inject scheduler
+schedule_source = os.path.join(packages_path, "UnitTesting", "sbin", "run_scheduler.py")
+schedule_target = os.path.join(packages_path, "UnitTesting", "zzz_run_scheduler.py")
 
-if sublime_is_running:
-    subprocess.Popen(["subl", "-b", "--command", "unit_testing_run_scheduler"])
-else:
-    subprocess.Popen(["subl"])
+if not os.path.exists(schedule_target):
+    shutil.copyfile(schedule_source, schedule_target)
+
+# launch sublime text
+subprocess.Popen(["subl"])
 
 # wait until the file has something
 print("Wait for Sublime Text response")
@@ -84,6 +86,8 @@ while (not os.path.exists(outfile) or os.stat(outfile).st_size == 0):
     sys.stdout.flush()
     if time.time() - startt > 60:
         print("Timeout: Sublime Text is not responding")
+        if os.path.exists(schedule_target):
+            os.unlink(schedule_target)
         sys.exit(1)
     time.sleep(1)
 print("")
@@ -112,6 +116,11 @@ if os.path.exists(coveragefile):
     txt = txt.replace(os.path.realpath(os.path.join(packages_path, package)), os.getcwd())
     with open(os.path.join(os.getcwd(), ".coverage"), "w") as f:
         f.write(txt)
+
+if os.path.exists(schedule_target):
+    os.unlink(schedule_target)
+
+time.sleep(1)
 
 if not success:
     sys.exit(1)

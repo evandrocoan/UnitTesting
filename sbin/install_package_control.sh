@@ -59,11 +59,15 @@ for i in {1..2}; do
     done
 
     pkill "[Ss]ubl" || true
+    killall 'plugin_host' || true
     sleep 2
     [ -f "$PCH_PATH/success" ] && break
 done
 
 if [ ! -f "$PCH_PATH/success" ]; then
+    if [ -f "$PCH_PATH/log" ]; then
+        cat "$PCH_PATH/log"
+    fi
     echo "Timeout: Fail to install Package Control."
     rm -rf "$PCH_PATH"
     exit 1

@@ -4,7 +4,7 @@ from .mixin import UnitTestingMixin
 
 try:
     from ColorSchemeUnit.lib.runner import ColorSchemeUnit
-except:
+except Exception:
     print('ColorSchemeUnit runner could not be imported')
 
 
@@ -15,7 +15,7 @@ class UnitTestingColorSchemeCommand(ApplicationCommand, UnitTestingMixin):
             return
 
         window = sublime.active_window()
-        settings = self.load_settings(package, **kargs)
+        settings = self.load_unittesting_settings(package, **kargs)
         stream = self.load_stream(package, settings["output"])
 
         # Make sure at least one file from the

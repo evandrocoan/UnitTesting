@@ -81,19 +81,18 @@ class UnitTestingRunSchedulerCommand(sublime_plugin.ApplicationCommand):
     def run(self):
         UnitTestingRunSchedulerCommand.ready = True
         scheduler = Scheduler()
-        scheduler.run()
+        sublime.set_timeout(scheduler.run, 2000)
 
 
 def try_running_scheduler():
     while not UnitTestingRunSchedulerCommand.ready:
         sublime.set_timeout(
             lambda: sublime.run_command("unit_testing_run_scheduler"), 1)
-        if UnitTestingRunSchedulerCommand.ready:
-            break
-        else:
-            time.sleep(0.5)
+
+        time.sleep(1)
 
 
 def run_scheduler():
+    UnitTestingRunSchedulerCommand.ready = False
     th = threading.Thread(target=try_running_scheduler)
     th.start()

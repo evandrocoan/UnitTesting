@@ -18,8 +18,7 @@ class UnitTestingMixin(object):
 
     @property
     def current_package_name(self):
-        """Return back the name of the current package
-        """
+        """Return back the name of the current package."""
         window = sublime.active_window()
         view = window.active_view()
         spp = os.path.realpath(sublime.packages_path())
@@ -69,12 +68,15 @@ class UnitTestingMixin(object):
             'Package:', package, _callback, None, None)
         view.run_command("select_all")
 
-    def load_settings(self, package, pattern=None, **kargs):
+    def load_unittesting_settings(self, package, **kargs):
         # default settings
         tests_dir = "tests"
         async = False
         deferred = False
         verbosity = 2
+        reload_package_on_testing = True
+        show_reload_progress = True
+        pattern = kargs["pattern"] if "pattern" in kargs else None
         output = kargs["output"] if "output" in kargs else None
         capture_console = False
 
@@ -85,6 +87,9 @@ class UnitTestingMixin(object):
             async = ss.get("async", async)
             deferred = ss.get("deferred", deferred)
             verbosity = ss.get("verbosity", verbosity)
+            reload_package_on_testing = ss.get(
+                "reload_package_on_testing", reload_package_on_testing)
+            show_reload_progress = ss.get("show_reload_progress", show_reload_progress)
             capture_console = ss.get("capture_console", False)
             if pattern is None:
                 pattern = ss.get("pattern")
@@ -99,6 +104,8 @@ class UnitTestingMixin(object):
             "async": async,
             "deferred": deferred,
             "verbosity": verbosity,
+            "reload_package_on_testing": reload_package_on_testing,
+            "show_reload_progress": show_reload_progress,
             "pattern": pattern,
             "output": output,
             "capture_console": capture_console
@@ -129,30 +136,21 @@ class UnitTestingMixin(object):
 
         return stream
 
-    def reload_package(self, package, show_progress=False, show_console=False):
-        if show_progress:
-            # a hack to run run_async of PackageReloader
+    def reload_package(self, package, dummy=False, show_reload_progress=False):
+        if show_reload_progress:
             progress_bar = ProgressBar("Reloading %s" % package)
             progress_bar.start()
-            window = sublime.active_window()
 
-            console_opened = window.active_panel() == "console"
-            if not console_opened and show_console:
-                window.run_command("show_panel", {"panel": "console"})
             try:
-                reload_package(package)
-            except:
+                reload_package(package, dummy=dummy, verbose=True)
+            except Exception:
                 sublime.status_message("Fail to reload {}.".format(package))
-                raise
             finally:
                 progress_bar.stop()
 
-            if not console_opened and show_console:
-                window.run_command("hide_panel", {"panel": "console"})
-
             sublime.status_message("{} reloaded.".format(package))
         else:
-            reload_package(package, dummy=False)
+            reload_package(package, dummy=dummy, verbose=False)
 
     def remove_test_modules(self, package, tests_dir):
         modules = {}
@@ -166,9 +164,9 @@ class UnitTestingMixin(object):
             except AttributeError:
                 try:
                     mpath = os.path.dirname(sys.modules[mname].__file__)
-                except:
+                except Exception:
                     continue
-            except:
+            except Exception:
                 continue
 
             tests_dir = os.path.join(sublime.packages_path(), package, tests_dir)
