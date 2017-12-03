@@ -17,6 +17,6 @@
   },
   {
     "caption": "UnitTesting: Show Output Panel",
-    "command": "show_panel", "args": { "panel": "output.UnitTesting" }
+    "command": "show_panel", "args": { "panel": "output.exec" }
   }
 ]
