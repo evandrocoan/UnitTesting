@@ -1,0 +1,4 @@
+{
+	"selector": "source.python, source.json",
+	"target": "unit_testing_current_package",
+}
