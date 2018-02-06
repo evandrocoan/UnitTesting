@@ -135,6 +135,25 @@ RunTests() {
     sleep 2
 }
 
+CloneGitPackage() {
+    if [ -z "$1" ] || [ -z "$2" ]; then
+        echo "ERROR: You must provide an valid git URL $1 and package name $2"
+    fi
+
+    git_url=$1
+    package_name=$2
+    package_full_path="$STP/$package_name"
+
+    if [ -d "$package_full_path" ]; then
+        echo "ERROR: The directory $package_full_path already exists!"
+
+    else
+        echo "download package $package_name: $git_url $package_full_path"
+        git clone --quiet --depth 1 "$git_url" "$package_full_path"
+        echo
+    fi
+}
+
 
 COMMAND=$1
 shift
@@ -160,5 +179,8 @@ case $COMMAND in
         ;;
     "run_color_scheme_tests")
         RunTests "--color-scheme-test" "$@"
+        ;;
+    "clone_git_package")
+        CloneGitPackage "$@"
         ;;
 esac
