@@ -2,6 +2,10 @@
 param(
     [Parameter(Mandatory = $false, Position = 0)]
     [string]$command,
+    [Parameter(Mandatory = $false, Position = 1)]
+    [string]$package_url,
+    [Parameter(Mandatory = $false, Position = 2)]
+    [string]$package_name,
     [Parameter(Mandatory = $false)]
     [switch] $coverage
 )
@@ -142,6 +146,14 @@ function RunTests {
     start-sleep -seconds 2
 }
 
+function CloneGitPackage {
+    $PACKAGE_PATH = "$STP\$package_name"
+
+    write-verbose "Downloading package: $package_url $PACKAGE_PATH"
+    git clone --depth 1 $package_url $PACKAGE_PATH 2>$null
+    write-verbose ""
+}
+
 try{
     switch ($command){
         "bootstrap" { Bootstrap }
@@ -151,6 +163,7 @@ try{
         "run_tests" { RunTests }
         "run_syntax_tests" { RunTests -syntax_test}
         "run_color_scheme_tests" { RunTests -color_scheme_test}
+        "clone_git_package" { CloneGitPackage }
     }
 }catch {
     throw $_
