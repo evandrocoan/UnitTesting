@@ -6,7 +6,7 @@ import os
 
 def plugin_loaded():
 
-    pc_settings = sublime.load_settings("Package Control.sublime-settings")
+    pc_settings = sublime.load_settings("PackagesManager.sublime-settings")
 
     logfile = os.path.join(
         sublime.packages_path(),
@@ -44,8 +44,8 @@ def plugin_loaded():
             sublime.set_timeout(check_bootstrap, 5000)
 
     def check_dependencies():
-        if 'Package Control' in sys.modules:
-            package_control = sys.modules['Package Control'].package_control
+        if 'PackagesManager' in sys.modules:
+            package_control = sys.modules['PackagesManager'].package_control
         else:
             sublime.set_timeout(check_dependencies, 5000)
             return

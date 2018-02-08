@@ -32,25 +32,10 @@ function Bootstrap {
 
     $UT_PATH = "$STP\UnitTesting"
     if (!(test-path -path "$UT_PATH")){
+        $UT_URL = "https://github.com/evandroforks/UnitTesting"
 
-        $UT_URL = "https://github.com/randy3k/UnitTesting"
-
-        if ( ${env:UNITTESTING_TAG} -eq $null){
-            if (${env:SUBLIME_TEXT_VERSION} -eq 2) {
-                $UNITTESTING_TAG = "0.10.6"
-            } elseif (${env:SUBLIME_TEXT_VERSION} -eq 3) {
-                # the latest tag
-                $UNITTESTING_TAG = git ls-remote --tags $UT_URL | %{$_ -replace ".*/(.*)$", '$1'} `
-                        | where-object {$_ -notmatch "\^"} |%{[System.Version]$_} `
-                        | sort | select-object -last 1 | %{ "$_" }
-            }
-        } else {
-            $UNITTESTING_TAG = ${env:UNITTESTING_TAG}
-        }
-
-        write-verbose "download UnitTesting tag: $UNITTESTING_TAG"
-        git clone --quiet --depth 1 --branch=$UNITTESTING_TAG $UT_URL "$UT_PATH" 2>$null
-        git -C "$UT_PATH" rev-parse HEAD | write-verbose
+        write-verbose "download UnitTesting package: $UNITTESTING_TAG"
+        git clone --depth 1 $UT_URL "$UT_PATH" 2>$null
         write-verbose ""
     }
 
@@ -69,7 +54,7 @@ function Bootstrap {
         }
 
         write-verbose "download sublime-coverage tag: $COVERAGE_TAG"
-        git clone --quiet --depth 1 --branch=$COVERAGE_TAG $COV_URL "$COV_PATH" 2>$null
+        git clone --depth 1 --branch=$COVERAGE_TAG $COV_URL "$COV_PATH" 2>$null
         git -C "$COV_PATH" rev-parse HEAD | write-verbose
         write-verbose ""
     }
@@ -99,7 +84,7 @@ function InstallColorSchemeUnit {
             $COLOR_SCHEME_UNIT_TAG = ${env:COLOR_SCHEME_UNIT_TAG}
         }
         write-verbose "download ColorSchemeUnit tag: $COLOR_SCHEME_UNIT_TAG"
-        git clone --quiet --depth 1 --branch=$COLOR_SCHEME_UNIT_TAG $CSU_URL "$CSU_PATH" 2>$null
+        git clone --depth 1 --branch=$COLOR_SCHEME_UNIT_TAG $CSU_URL "$CSU_PATH" 2>$null
         git -C "$CSU_PATH" rev-parse HEAD | write-verbose
         write-verbose ""
     }
@@ -119,7 +104,7 @@ function InstallKeypress {
             $KEYPRESS_TAG = ${env:KEYPRESS_TAG}
         }
         write-verbose "download ColorSchemeUnit tag: $KEYPRESS_TAG"
-        git clone --quiet --depth 1 --branch=$KEYPRESS_TAG $KP_URL "$KP_PATH" 2>$null
+        git clone --depth 1 --branch=$KEYPRESS_TAG $KP_URL "$KP_PATH" 2>$null
         git -C "$KP_PATH" rev-parse HEAD | write-verbose
         write-verbose ""
     }

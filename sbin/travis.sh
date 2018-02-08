@@ -35,7 +35,7 @@ Bootstrap() {
     if [ ! -d "$UT_PATH" ]; then
 
         if [ -z $UT_URL ]; then
-            UT_URL="https://github.com/randy3k/UnitTesting"
+            UT_URL="https://github.com/evandroforks/UnitTesting"
         fi
 
         if [ -z $UNITTESTING_TAG ]; then
@@ -49,8 +49,8 @@ Bootstrap() {
             fi
         fi
 
-        echo "download UnitTesting tag: $UNITTESTING_TAG"
-        git clone --quiet --depth 1 --branch $UNITTESTING_TAG "$UT_URL" "$UT_PATH"
+        echo "download UnitTesting tag: $UNITTESTING_TAG, $UT_URL $UT_PATH"
+        git clone --depth 1 "$UT_URL" "$UT_PATH"
         git -C "$UT_PATH" rev-parse HEAD
         echo
     fi
@@ -68,7 +68,7 @@ Bootstrap() {
         fi
 
         echo "download sublime-coverage tag: $COVERAGE_TAG"
-        git clone --quiet --depth 1 --branch $COVERAGE_TAG "$COV_URL" "$COV_PATH"
+        git clone --depth 1 --branch $COVERAGE_TAG "$COV_URL" "$COV_PATH"
         git -C "$COV_PATH" rev-parse HEAD
         echo
     fi
@@ -97,7 +97,7 @@ InstallColorSchemeUnit() {
         fi
 
         echo "download ColorSchemeUnit tag: $COLOR_SCHEME_UNIT_TAG"
-        git clone --quiet --depth 1 --branch $COLOR_SCHEME_UNIT_TAG "$CSU_URL" "$CSU_PATH"
+        git clone --depth 1 --branch $COLOR_SCHEME_UNIT_TAG "$CSU_URL" "$CSU_PATH"
         git -C "$CSU_PATH" rev-parse HEAD
         echo
     fi
@@ -117,7 +117,7 @@ InstallKeypress() {
         fi
 
         echo "download Keypress tag: $KEYPRESS_TAG"
-        git clone --quiet --depth 1 --branch $KEYPRESS_TAG "$KP_URL" "$KP_PATH"
+        git clone --depth 1 --branch $KEYPRESS_TAG "$KP_URL" "$KP_PATH"
         git -C "$KP_PATH" rev-parse HEAD
         echo
     fi
@@ -149,7 +149,7 @@ CloneGitPackage() {
 
     else
         echo "download package $package_name: $git_url $package_full_path"
-        git clone --quiet --depth 1 "$git_url" "$package_full_path"
+        git clone --depth 1 "$git_url" "$package_full_path"
         echo
     fi
 }

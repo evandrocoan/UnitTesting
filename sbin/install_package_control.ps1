@@ -8,9 +8,14 @@ try{
     $STIP = "C:\st\Data\Installed Packages"
     New-Item -itemtype directory $STIP -force >$null
 
-    $PC_PATH = "$STIP\Package Control.sublime-package"
-    $PC_URL = "https://packagecontrol.io/Package Control.sublime-package"
-    (New-Object System.Net.WebClient).DownloadFile($PC_URL, $PC_PATH)
+    $PACKAGE_CONTROL_PATH = "$STP\PackagesManager"
+    if (!(test-path -path "$PACKAGE_CONTROL_PATH")){
+        $PACKAGE_CONTROL_URL = "https://github.com/evandrocoan/PackagesManager"
+
+        write-verbose "download PackagesManager package: $UNITTESTING_TAG"
+        git clone --depth 1 $PACKAGE_CONTROL_URL "$PACKAGE_CONTROL_PATH" 2>$null
+        write-verbose ""
+    }
 
     $PCH_PATH = "$STP\0_install_package_control_helper"
     New-Item -itemtype directory $PCH_PATH -force >$null
@@ -39,20 +44,20 @@ try{
             get-content -Path "$PCH_PATH\log"
         }
         remove-item "$PCH_PATH" -Recurse -Force
-        throw "Timeout: Fail to install Package Control."
+        throw "Timeout: Fail to install PackagesManager."
     }
 
     remove-item "$PCH_PATH" -Recurse -Force
     write-host
 
-    $PC_SETTINGS = "C:\st\Data\Packages\User\Package Control.sublime-settings"
+    $PC_SETTINGS = "C:\st\Data\Packages\User\PackagesManager.sublime-settings"
 
     if (-not (test-path $PC_SETTINGS)) {
-        write-verbose "creating Package Control.sublime-settings"
+        write-verbose "creating PackagesManager.sublime-settings"
         "{`"ignore_vcs_packages`": true }" | out-file -filepath $PC_SETTINGS -encoding ascii
     }
 
-    write-verbose "Package Control installed."
+    write-verbose "PackagesManager installed."
 
 } catch {
     throw $_
