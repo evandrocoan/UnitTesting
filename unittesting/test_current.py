@@ -11,7 +11,7 @@ class UnitTestingCurrentPackageCommand(UnitTestingCommand):
     def run(self):
         project_name = self.current_package_name
         if not project_name:
-            sublime.message_dialog("Cannot determine package name.")
+            sublime.message_dialog("UnitTesting Package: Cannot determine package name.")
             return
 
         sublime.set_timeout_async(
@@ -31,7 +31,7 @@ class UnitTestingCurrentPackageCoverageCommand(UnitTestingCoverageCommand):
     def run(self):
         project_name = self.current_package_name
         if not project_name:
-            sublime.message_dialog("Cannot determine package name.")
+            sublime.message_dialog("UnitTesting Package: Cannot determine package name.")
             return
 
         super(UnitTestingCurrentPackageCoverageCommand, self).run(project_name)
@@ -44,7 +44,7 @@ class UnitTestingCurrentFileCommand(UnitTestingCommand):
     def run(self):
         project_name = self.current_package_name
         if not project_name:
-            sublime.message_dialog("Cannot determine package name.")
+            sublime.message_dialog("UnitTesting Package: Cannot determine package name.")
             return
 
         test_file = self.current_test_file
