@@ -121,10 +121,9 @@ class UnitTestingMixin(object):
 
     def load_stream(self, package, settings):
         output = settings["output"]
-        capture_console = settings["capture_console"]
         if not output or output == "<panel>":
             output_panel = OutputPanel(
-                'exec', file_regex=r'File "([^"]*)", line (\d+)', capture_console=capture_console)
+                'exec', file_regex=r'File "([^"]*)", line (\d+)')
             output_panel.show()
             stream = output_panel
         else:
