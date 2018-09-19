@@ -7,8 +7,8 @@ from .test_current import UnitTestingCurrentFileCommand
 from .test_current import UnitTestingCurrentPackageCommand
 from .test_current import UnitTestingCurrentPackageCoverageCommand
 from .test_syntax import UnitTestingSyntaxCommand
+from .test_syntax import UnitTestingSyntaxCompatibilityCommand
 from .test_color_scheme import UnitTestingColorSchemeCommand
-from . import helpers  # FIXME is this required to be imported? # noqa: F401
 
 
 __all__ = [
@@ -21,5 +21,6 @@ __all__ = [
     "UnitTestingCurrentPackageCommand",
     "UnitTestingCurrentPackageCoverageCommand",
     "UnitTestingSyntaxCommand",
+    "UnitTestingSyntaxCompatibilityCommand",
     "UnitTestingColorSchemeCommand"
 ]

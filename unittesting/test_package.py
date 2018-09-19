@@ -7,10 +7,8 @@ from unittest import TextTestRunner, TestSuite
 from .core import TestLoader, DeferringTextTestRunner, DeferrableTestCase
 from .mixin import UnitTestingMixin
 from .const import DONE_MESSAGE
-from .utils import ProgressBar
+from .utils import ProgressBar, StdioSplitter
 import threading
-
-version = sublime.version()
 
 
 class UnitTestingCommand(sublime_plugin.ApplicationCommand, UnitTestingMixin):
@@ -43,24 +41,9 @@ class UnitTestingCommand(sublime_plugin.ApplicationCommand, UnitTestingMixin):
             handler = logging.StreamHandler(stream)
             logging.root.addHandler(handler)
 
-            class StdOutForward(object):
-                def write(self, data):
-                    stdout.write(data)
-                    stream.write(data)
-                def flush(self):
-                    stderr.flush()
-                    stream.flush()
+        sys.stdout = StdioSplitter(stdout, stream)
+        sys.stderr = StdioSplitter(stderr, stream)
 
-            class StdErrForward(object):
-                def write(self, data):
-                    stderr.write(data)
-                    stream.write(data)
-                def flush(self):
-                    stderr.flush()
-                    stream.flush()
-
-            sys.stdout = StdOutForward()
-            sys.stderr = StdErrForward()
         testRunner = None
         progress_bar = ProgressBar("Testing %s" % package)
         progress_bar.start()
@@ -95,9 +78,15 @@ class UnitTestingCommand(sublime_plugin.ApplicationCommand, UnitTestingMixin):
 
                     for hook in cleanup_hooks:
                         hook()
-                    stream.write("\n")
-                    stream.write(DONE_MESSAGE)
+
+                    if not hasattr(stream, 'window'):
+                        # If it's an output panel don't print done message,
+                        # because it's only required for CI test runs.
+                        stream.write("\n")
+                        stream.write(DONE_MESSAGE)
+
                     stream.close()
+
                     if settings["capture_console"]:
                         sys.stdout = stdout
                         sys.stderr = stderr
