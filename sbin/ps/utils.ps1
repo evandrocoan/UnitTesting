@@ -69,12 +69,24 @@ function gitFetchLatestTagFromRepository {
 
 function gitCloneTag {
     param([string]$Tag, [string]$RepositoryUrl, [string]$Destination)
+    logVerbose "downloading $Tag $RepositoryUrl $Destination"
     git clone --quiet --depth 1 --branch=$Tag $RepositoryUrl "$Destination" 2>$null
+}
+
+function gitClone {
+    param([string]$RepositoryUrl, [string]$Destination)
+    logVerbose "downloading $RepositoryUrl $Destination"
+    git clone --quiet --depth 1 $RepositoryUrl "$Destination" 2>$null
 }
 
 function gitGetHeadRevisionName {
     param([string]$RepositoryDirectory)
-    git -C $RepositoryDirectory rev-parse HEAD
+    # https://stackoverflow.com/questions/17329443/creating-a-folder-if-it-does-not-exists-item-already-exists
+    if(Test-Path -Path "$RepositoryDirectory\.git") {
+        git -C $RepositoryDirectory rev-parse HEAD
+    } else {
+        logVerbose "Error: gitGetHeadRevisionName() Could not find the directory '$RepositoryDirectory\.git'"
+    }
 }
 
 function getLatestUnitTestingBuildTag {
@@ -101,6 +113,14 @@ function cloneRepositoryTag {
     $Tag = getRepositoryTag $PreferredTag $RepositoryUrl
     logVerbose "cloning $(split-path $RepositoryUrl -leaf) tag: $Tag into $Destination..."
     gitCloneTag $Tag $RepositoryUrl $Destination
+    gitGetHeadRevisionName $Destination | logVerbose
+    logVerbose ""
+}
+
+function cloneRepository {
+    param([string]$RepositoryUrl, [string]$Destination)
+    logVerbose "cloning $RepositoryUrl into $Destination..."
+    gitClone $RepositoryUrl $Destination
     gitGetHeadRevisionName $Destination | logVerbose
     logVerbose ""
 }

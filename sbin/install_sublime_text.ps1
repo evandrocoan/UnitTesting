@@ -11,7 +11,7 @@ param(
     [int]$Version = $SublimeTextVersion
 )
 
-$ErrorActionPreference = 'stop'
+# $ErrorActionPreference = 'stop'
 
 $private:MaxRetries = 20
 $private:SublimeTextUrl = "http://www.sublimetext.com/$Version"

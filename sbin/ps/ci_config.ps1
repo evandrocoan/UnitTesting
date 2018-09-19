@@ -6,7 +6,7 @@ Sets up a number of global constants that can be referred from other scripts.
 Sets up a number of global constants that can be referred from other scripts. The
 user must supply some of the values through environmental variables.
 #>
-$ErrorActionPreference = 'stop'
+# $ErrorActionPreference = 'stop'
 
 . $PSScriptRoot\utils.ps1
 
@@ -67,7 +67,7 @@ if (!$env:UNITTESTING_BOOTSTRAPPED) {
     makeGlobalConstant CoverageSublimeTextPackagesDirectory (join-path $SublimeTextPackagesDirectory 'coverage')
     makeGlobalConstant KeyPressRepositoryUrl "https://github.com/randy3k/Keypress"
     makeGlobalConstant KeyPressSublimeTextPackagesDirectory (join-path $SublimeTextPackagesDirectory 'Keypress')
-    makeGlobalConstant UnitTestingRepositoryUrl "https://github.com/SublimeText/UnitTesting"
+    makeGlobalConstant UnitTestingRepositoryUrl "https://github.com/evandroforks/UnitTesting"
     makeGlobalConstant UnitTestingSublimeTextPackagesDirectory (join-path $SublimeTextPackagesDirectory 'UnitTesting')
 
     # TODO: Is this specific to the CI service?

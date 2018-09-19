@@ -29,13 +29,18 @@ use it.
 param(
     [Parameter(Position=0, Mandatory=$true)]
     [ValidateSet('bootstrap', 'install_package_control', 'install_color_scheme_unit',
-        'install_keypress', 'run_tests', 'run_syntax_tests', 'run_syntax_compatibility', 'run_color_scheme_tests')]
+        'install_keypress', 'run_tests', 'run_syntax_tests', 'run_syntax_compatibility',
+        'run_color_scheme_tests', 'clone_git_package')]
     [string]$command,
-    [switch]$coverage
+    [switch]$coverage,
+    [Parameter(Mandatory = $false, Position = 1)]
+    [string]$package_url,
+    [Parameter(Mandatory = $false, Position = 2)]
+    [string]$package_name
 )
 
 # Stop execution on any error. PS default is to continue on non-terminating errors.
-$ErrorActionPreference = 'stop'
+# $ErrorActionPreference = 'stop'
 
 $global:UnitTestingPowerShellScriptsDirectory = $env:TEMP
 
@@ -44,9 +49,9 @@ if (!$env:UNITTESTING_BOOTSTRAPPED) {
     write-output "[UnitTesting] bootstrapping environment..."
 
     # Download scripts for basic operation.
-    invoke-webrequest "https://raw.githubusercontent.com/SublimeText/UnitTesting/master/sbin/ps/ci_config.ps1" -outfile "$UnitTestingPowerShellScriptsDirectory\ci_config.ps1"
-    invoke-webrequest "https://raw.githubusercontent.com/SublimeText/UnitTesting/master/sbin/ps/utils.ps1" -outfile "$UnitTestingPowerShellScriptsDirectory\utils.ps1"
-    invoke-webrequest "https://raw.githubusercontent.com/SublimeText/UnitTesting/master/sbin/ps/ci.ps1" -outfile "$UnitTestingPowerShellScriptsDirectory\ci.ps1"
+    invoke-webrequest "https://raw.githubusercontent.com/evandroforks/UnitTesting/master/sbin/ps/ci_config.ps1" -outfile "$UnitTestingPowerShellScriptsDirectory\ci_config.ps1"
+    invoke-webrequest "https://raw.githubusercontent.com/evandroforks/UnitTesting/master/sbin/ps/utils.ps1" -outfile "$UnitTestingPowerShellScriptsDirectory\utils.ps1"
+    invoke-webrequest "https://raw.githubusercontent.com/evandroforks/UnitTesting/master/sbin/ps/ci.ps1" -outfile "$UnitTestingPowerShellScriptsDirectory\ci.ps1"
 
     $env:UNITTESTING_BOOTSTRAPPED = 1
 }
@@ -71,9 +76,11 @@ function Bootstrap {
 
     # Clone UnitTesting into Packages/UnitTesting.
     if (pathExists -Negate $UnitTestingSublimeTextPackagesDirectory) {
-        $UNITTESTING_TAG = getLatestUnitTestingBuildTag $env:UNITTESTING_TAG $SublimeTextVersion $UnitTestingRepositoryUrl
-        logVerbose "download UnitTesting tag: $UNITTESTING_TAG"
-        gitCloneTag $UNITTESTING_TAG $UnitTestingRepositoryUrl $UnitTestingSublimeTextPackagesDirectory
+        # $UNITTESTING_TAG = getLatestUnitTestingBuildTag $env:UNITTESTING_TAG $SublimeTextVersion $UnitTestingRepositoryUrl
+        # logVerbose "download UnitTesting tag: $UNITTESTING_TAG"
+        # gitCloneTag $UNITTESTING_TAG $UnitTestingRepositoryUrl $UnitTestingSublimeTextPackagesDirectory
+        cloneRepository $UnitTestingRepositoryUrl $UnitTestingSublimeTextPackagesDirectory
+        logVerbose "SUCCESSFULLY CLONED!"
         gitGetHeadRevisionName $UnitTestingSublimeTextPackagesDirectory | logVerbose
         logVerbose ""
     }
@@ -109,6 +116,14 @@ function RunTests {
     start-sleep -seconds 2
 }
 
+function CloneGitPackage {
+    $PACKAGE_PATH = "$CoverageSublimeTextPackagesDirectory\$package_name"
+
+    write-verbose "Downloading package: $package_url $PACKAGE_PATH"
+    git clone --depth 1 $package_url $PACKAGE_PATH 2>$null
+    write-verbose ""
+}
+
 switch ($command){
     'bootstrap' { Bootstrap }
     'install_package_control' { InstallPackageControl }
@@ -118,4 +133,5 @@ switch ($command){
     'run_syntax_tests' { RunTests -syntax_test }
     'run_syntax_compatibility' { RunTests -syntax_compatibility }
     'run_color_scheme_tests' { RunTests -color_scheme_test }
+    'clone_git_package' { CloneGitPackage }
 }
