@@ -13,7 +13,7 @@ try{
         $PACKAGE_CONTROL_URL = "https://github.com/evandrocoan/PackagesManager"
 
         write-verbose "download PackagesManager package: $UNITTESTING_TAG"
-        git clone --depth 1 $PACKAGE_CONTROL_URL "$PACKAGE_CONTROL_PATH" 2>$null
+        git clone --quiet --depth 1 $PACKAGE_CONTROL_URL "$PACKAGE_CONTROL_PATH" 2>$null
         write-verbose ""
     }
 

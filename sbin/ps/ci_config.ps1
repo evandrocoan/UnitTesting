@@ -6,7 +6,7 @@ Sets up a number of global constants that can be referred from other scripts.
 Sets up a number of global constants that can be referred from other scripts. The
 user must supply some of the values through environmental variables.
 #>
-# $ErrorActionPreference = 'stop'
+$ErrorActionPreference = 'stop'
 
 . $PSScriptRoot\utils.ps1
 

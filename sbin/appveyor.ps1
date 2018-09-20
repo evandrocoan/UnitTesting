@@ -11,7 +11,7 @@ param(
     [switch] $coverage
 )
 
-# $ErrorActionPreference = 'stop'
+$ErrorActionPreference = 'stop'
 
 # Scripts other than the bootstrapper are downloaded to and used from this directory.
 $global:UnitTestingPowerShellScriptsDirectory = $env:TEMP

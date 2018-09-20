@@ -40,7 +40,7 @@ param(
 )
 
 # Stop execution on any error. PS default is to continue on non-terminating errors.
-# $ErrorActionPreference = 'stop'
+$ErrorActionPreference = 'stop'
 
 $global:UnitTestingPowerShellScriptsDirectory = $env:TEMP
 
@@ -118,10 +118,10 @@ function RunTests {
 
 function CloneGitPackage {
     $PACKAGE_PATH = "$CoverageSublimeTextPackagesDirectory\$package_name"
+    logVerbose "Downloading package: $package_url $PACKAGE_PATH"
 
-    write-verbose "Downloading package: $package_url $PACKAGE_PATH"
-    git clone --depth 1 $package_url $PACKAGE_PATH 2>$null
-    write-verbose ""
+    cloneRepository $package_url $PACKAGE_PATH
+    logVerbose ""
 }
 
 switch ($command){
