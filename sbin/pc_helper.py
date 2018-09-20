@@ -63,8 +63,9 @@ def plugin_loaded():
                     kill_subl()
                 else:
                     with open(logfile, "a") as f:
-                        f.write("missing dependencies:" + "\n")
-                        f.write(" ".join(missing_dependencies) + "\n")
+                        f.write("Unit Testing pc_helper(), missing dependencies: %s\n" % missing_dependencies)
+                        f.write("required_dependencies: %s\n" % required_dependencies)
+                        f.write("found_dependencies: %s\n" % found_dependencies)
                     sublime.set_timeout(_check_dependencies, 5000)
 
         def _check_dependencies():
