@@ -92,7 +92,6 @@ function Bootstrap {
 }
 
 function InstallPackageControl {
-    remove-item $CoverageSublimeTextPackagesDirectory -Force -Recurse
     & "$UnitTestingSublimeTextPackagesDirectory\sbin\install_package_control.ps1" -verbose
 }
 
@@ -117,7 +116,7 @@ function RunTests {
 }
 
 function CloneGitPackage {
-    $PACKAGE_PATH = "$CoverageSublimeTextPackagesDirectory\$package_name"
+    $PACKAGE_PATH = "$SublimeTextPackagesDirectory\$package_name"
     logVerbose "Downloading package: $package_url $PACKAGE_PATH"
 
     cloneRepository $package_url $PACKAGE_PATH
