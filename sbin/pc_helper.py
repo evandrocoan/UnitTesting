@@ -58,7 +58,7 @@ def plugin_loaded():
             def finish(self, installed_packages, found_packages, found_dependencies):
                 missing_dependencies = required_dependencies - set(found_dependencies)
 
-                if len(missing_dependencies) == 0:
+                if len(missing_dependencies) == 0 or len(missing_dependencies) == 1 and 'coverage' in missing_dependencies:
                     touch("success")
                     kill_subl()
                 else:
@@ -66,6 +66,7 @@ def plugin_loaded():
                         f.write("Unit Testing pc_helper(), missing dependencies: %s\n" % missing_dependencies)
                         f.write("required_dependencies: %s\n" % required_dependencies)
                         f.write("found_dependencies: %s\n" % found_dependencies)
+                        f.write("'coverage' in missing_dependencies: %s\n" % str('coverage' in missing_dependencies))
                     sublime.set_timeout(_check_dependencies, 5000)
 
         def _check_dependencies():
