@@ -106,13 +106,29 @@ function InstallKeypress {
 function RunTests {
     [CmdletBinding()]
     param([switch]$syntax_test, [switch]$syntax_compatibility, [switch]$color_scheme_test, [switch]$coverage)
+    logVerbose "RUNNING HERE 1"
+    logVerbose "RUNNING HERE 1"
+    logVerbose "RUNNING HERE 1"
+    logVerbose "RUNNING HERE 1"
+    logVerbose "RUNNING HERE 1"
 
     # TODO: Change script name to conform to PS conventions.
     # TODO: Do not use verbose by default.
     & "$UnitTestingSublimeTextPackagesDirectory\sbin\run_tests.ps1" $PackageUnderTestName -verbose @PSBoundParameters
+    logVerbose "RUNNING HERE 2"
+    logVerbose "RUNNING HERE 2"
+    logVerbose "RUNNING HERE 2"
+    logVerbose "RUNNING HERE 2"
+    logVerbose "RUNNING HERE 2"
 
     stop-process -force -processname sublime_text -ea silentlycontinue
     start-sleep -seconds 2
+    logVerbose "RUNNING HERE 3"
+    logVerbose "RUNNING HERE 3"
+    logVerbose "RUNNING HERE 3"
+    logVerbose "RUNNING HERE 3"
+    logVerbose "RUNNING HERE 3"
+    logVerbose "RUNNING HERE 3"
 }
 
 function CloneGitPackage {

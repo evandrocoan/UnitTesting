@@ -20,12 +20,24 @@ new-variable -name 'UTF8Encoding' -option CONSTANT -scope 'script' `
 $packagesPath = 'C:\st\Data\Packages'
 $stPath = 'C:\st\sublime_text.exe'
 
+write-verbose "RUNNING HERE 4"
+write-verbose "RUNNING HERE 4"
+write-verbose "RUNNING HERE 4"
+write-verbose "RUNNING HERE 4"
+
 $outDir = "$packagesPath\User\UnitTesting\$PackageToTest"
 $outFile = "$outDir\result"
 $coverageFile = "$outDir\coverage"
 [void] (new-item -itemtype file $outFile -force)
 
 remove-item $outFile -force -erroraction silentlycontinue
+
+write-verbose "RUNNING HERE 5"
+write-verbose "RUNNING HERE 5"
+write-verbose "RUNNING HERE 5"
+write-verbose "RUNNING HERE 5"
+write-verbose "RUNNING HERE 5"
+write-verbose "RUNNING HERE 5"
 
 # Configure packages to be tested.
 $jpath = "$packagesPath\User\UnitTesting\schedule.json"
@@ -38,6 +50,13 @@ else {
     [System.IO.File]::WriteAllText($jpath, "[]", $UTF8Encoding)
     $schedule = convertfrom-json "$(get-content $jpath)"
 }
+
+write-verbose "RUNNING HERE 6"
+write-verbose "RUNNING HERE 6"
+write-verbose "RUNNING HERE 6"
+write-verbose "RUNNING HERE 6"
+write-verbose "RUNNING HERE 6"
+write-verbose "RUNNING HERE 6"
 
 $found = (@($schedule | foreach-object { $_.package }) -eq $PackageToTest).length
 if ($found -eq 0) {
@@ -57,6 +76,13 @@ if ($found -eq 0) {
     $schedule += $schedule_info
 }
 
+write-verbose "RUNNING HERE 7"
+write-verbose "RUNNING HERE 7"
+write-verbose "RUNNING HERE 7"
+write-verbose "RUNNING HERE 7"
+write-verbose "RUNNING HERE 7"
+write-verbose "RUNNING HERE 7"
+
 [System.IO.File]::WriteAllText(
     $jpath, (convertto-json $schedule), $UTF8Encoding)
 
@@ -73,6 +99,13 @@ if (-not (test-path $schedule_target)) {
     copy-item $schedule_source $schedule_target -force
 }
 
+write-verbose "RUNNING HERE 8"
+write-verbose "RUNNING HERE 8"
+write-verbose "RUNNING HERE 8"
+write-verbose "RUNNING HERE 8"
+write-verbose "RUNNING HERE 8"
+write-verbose "RUNNING HERE 8"
+
 # launch sublime
 $sublimeIsRunning = get-process 'sublime_text' -erroraction silentlycontinue
 
@@ -80,6 +113,13 @@ $sublimeIsRunning = get-process 'sublime_text' -erroraction silentlycontinue
 if($sublimeIsRunning -eq $null) {
     start-process $stPath
 }
+
+write-verbose "RUNNING HERE 9"
+write-verbose "RUNNING HERE 9"
+write-verbose "RUNNING HERE 9"
+write-verbose "RUNNING HERE 9"
+write-verbose "RUNNING HERE 9"
+write-verbose "RUNNING HERE 9"
 
 $startTime = get-date
 while (-not (test-path $outFile) -or (get-item $outFile).length -eq 0) {
@@ -96,6 +136,13 @@ while (-not (test-path $outFile) -or (get-item $outFile).length -eq 0) {
 write-host
 
 write-verbose "start to read output"
+
+write-verbose "RUNNING HERE 10"
+write-verbose "RUNNING HERE 10"
+write-verbose "RUNNING HERE 10"
+write-verbose "RUNNING HERE 10"
+write-verbose "RUNNING HERE 10"
+write-verbose "RUNNING HERE 10"
 
 $copy = "$outfile.copy"
 $read = 0
@@ -131,8 +178,17 @@ while ($true) {
         $read = $read + $count - 1
         if ($done) { break }
     }
+    write-verbose "RUNNING HERE 13 - SLEEP"
     start-sleep -milliseconds 200
 }
+
+write-verbose "RUNNING HERE 11"
+write-verbose "RUNNING HERE 11"
+write-verbose "RUNNING HERE 11"
+write-verbose "RUNNING HERE 11"
+write-verbose "RUNNING HERE 11"
+write-verbose "RUNNING HERE 11"
+
 
 # restore .coverage if it exists, needed for coveralls
 if (test-path $coverageFile) {
@@ -143,9 +199,22 @@ if (test-path $coverageFile) {
     set-content ".\.coverage" -value $data
 }
 
+write-verbose "RUNNING HERE 12"
+write-verbose "RUNNING HERE 12"
+write-verbose "RUNNING HERE 12"
+write-verbose "RUNNING HERE 12"
+write-verbose "RUNNING HERE 12"
+write-verbose "RUNNING HERE 12"
+
 if (test-path $schedule_target) {
     remove-item $schedule_target -force
 }
+
+write-verbose "RUNNING HERE 13"
+write-verbose "RUNNING HERE 13"
+write-verbose "RUNNING HERE 13"
+write-verbose "RUNNING HERE 13"
+write-verbose "RUNNING HERE 13"
 
 if (!$success) {
     throw
