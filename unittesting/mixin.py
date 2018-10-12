@@ -71,6 +71,7 @@ class UnitTestingMixin(object):
     def load_unittesting_settings(self, package, **kargs):
         # default settings
         tests_dir = "tests"
+        include_dir = ""
         use_async = False
         deferred = False
         verbosity = 2
@@ -84,6 +85,7 @@ class UnitTestingMixin(object):
         if os.path.exists(jfile):
             ss = JsonFile(jfile).load()
             tests_dir = ss.get("tests_dir", tests_dir)
+            include_dir = ss.get("include_dir", include_dir)
             use_async = ss.get("async", use_async)
             deferred = ss.get("deferred", deferred)
             verbosity = ss.get("verbosity", verbosity)
@@ -101,6 +103,7 @@ class UnitTestingMixin(object):
 
         return {
             "tests_dir": tests_dir,
+            "include_dir": include_dir,
             "async": use_async,
             "deferred": deferred,
             "verbosity": verbosity,

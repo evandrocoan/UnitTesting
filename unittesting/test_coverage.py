@@ -22,7 +22,7 @@ class UnitTestingCoverageCommand(UnitTestingCommand):
         if os.path.exists(data_file):
             os.unlink(data_file)
         config_file = os.path.join(package_path, ".coveragerc")
-        include = "{}/*".format(package_path)
+        include = "{}/{}*".format(package_path, settings["include_dir"] + '/' if settings["include_dir"] else "" )
         omit = "{}/{}/*".format(package_path, settings["tests_dir"])
         if os.path.exists(config_file):
             with open(config_file, "r") as f:
