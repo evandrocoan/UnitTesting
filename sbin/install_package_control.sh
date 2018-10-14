@@ -64,7 +64,7 @@ for i in {1..2}; do
 
     ENDTIME=$(( $(date +%s) + 60 ))
     printf "Checking if Sublime Text has started and PackagesManager has ran.\n"
-    while [ ! -f "$PCH_PATH/success" ] && [ $(date +%s) -lt $ENDTIME ]  ; do
+    while [ ! -f "$PCH_PATH/success" ] && [ $(date +%s) -lt $ENDTIME ] ; do
         printf "The time limit is on $(date +%s) of $ENDTIME...\n"
         sleep 5
     done

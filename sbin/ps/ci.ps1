@@ -61,8 +61,42 @@ if (!$env:UNITTESTING_BOOTSTRAPPED) {
 . $UnitTestingPowerShellScriptsDirectory\ci_config.ps1
 . $UnitTestingPowerShellScriptsDirectory\utils.ps1
 
+$fullConsoleDebugToolsFullConsoleOutput = "$SublimeTextPackagesDirectory\full_console"
+$fullConsoleDebugToolsFullConsoleScript = "$SublimeTextDirectory\0_0full_console_output.py"
+$fullConsoleDebugToolsFullConsoleZip = "$SublimeTextInstalledPackagesDirectory\0_0full_console_output.zip"
+$fullConsoleDebugToolsFullConsolePackage = "0_0full_console_output.sublime-package"
+
+$debugToolsConsoleScript = @"
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+import sys
+import time
+import threading
+
+from DebugTools.all.debug_tools import getLogger
+log = getLogger("full_console_output", file=r"$fullConsoleDebugToolsFullConsoleOutput", stdout=True)
+
+print("")
+print("Testing print")
+sys.stderr.write("Testing sys.stderr for %s\n" % r"$fullConsoleDebugToolsFullConsoleOutput")
+sys.stdout.write("Testing sys.stdout for %s\n" % r"$fullConsoleDebugToolsFullConsoleOutput")
+
+log(1, "TESTING!")
+log(1, "TESTING! logfile to: %s", r"$fullConsoleDebugToolsFullConsoleOutput")
+
+def time_passing():
+
+    while(True):
+        log(1, "The time is passing...")
+        time.sleep(1)
+
+thread = threading.Thread( target=time_passing )
+thread.start()
+"@
+
 function Bootstrap {
     ensureCreateDirectory $SublimeTextPackagesDirectory
+    ensureCreateDirectory $SublimeTextInstalledPackagesDirectory
 
     # Copy plugin files to Packages/<Package> folder.
     if ($PackageUnderTestName -eq $SymbolCopyAll){
@@ -97,7 +131,17 @@ function Bootstrap {
         logVerbose ""
     }
 
-    # Clone coverage plugin into Packages/coverage.
+    logVerbose "Start capturing all Sublime Text console with DebugTools"
+    "$debugToolsConsoleScript" | Out-File -FilePath "$fullConsoleDebugToolsFullConsoleScript" -Encoding ASCII
+
+    logVerbose "Create it as Packed file because they are loaded first by Sublime Text"
+    Compress-Archive -Path "$fullConsoleDebugToolsFullConsoleScript" -DestinationPath "$fullConsoleDebugToolsFullConsoleZip" -CompressionLevel Optimal -Force
+
+    logVerbose "Renaming the zip file to $fullConsoleDebugToolsFullConsolePackage"
+    Rename-Item "$fullConsoleDebugToolsFullConsoleZip" -NewName "$fullConsoleDebugToolsFullConsolePackage"
+
+    logVerbose ""
+    logVerbose "Clone coverage plugin into Packages/coverage"
     installPackageForSublimeTextVersion3IfNotPresent $CoverageSublimeTextPackagesDirectory $env:COVERAGE_TAG $CoverageRepositoryUrl
 
     & "$UnitTestingSublimeTextPackagesDirectory\sbin\install_sublime_text.ps1" -verbose

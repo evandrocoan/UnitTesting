@@ -11,6 +11,9 @@ param(
     [switch] $coverage
 )
 
+# Enable debug mode as the cmd `@echo on`
+# Set-PSDebug -Trace 1
+
 $ErrorActionPreference = 'stop'
 
 # Scripts other than the bootstrapper are downloaded to and used from this directory.

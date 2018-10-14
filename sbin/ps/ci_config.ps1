@@ -51,6 +51,7 @@ if (!$env:UNITTESTING_BOOTSTRAPPED) {
     makeGlobalConstant SublimeTextExecutablePath (join-path $SublimeTextDirectory 'sublime_text.exe')
     # The path to the Sublime Text Packages directory.
     makeGlobalConstant SublimeTextPackagesDirectory (eitherOr $env:SUBLIME_TEXT_PACKAGES_DIRECTORY (join-path $SublimeTextDirectory "Data\Packages"))
+    makeGlobalConstant SublimeTextInstalledPackagesDirectory (eitherOr $env:SUBLIME_TEXT_INSTALLED_PACKAGES_DIRECTORY (join-path $SublimeTextDirectory "Data\Installed Packages"))
     # TODO: For compatibility; remove when not used anymore.
     $global:STP = $SublimeTextPackagesDirectory
 

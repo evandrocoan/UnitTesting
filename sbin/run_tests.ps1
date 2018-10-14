@@ -20,10 +20,27 @@ new-variable -name 'UTF8Encoding' -option CONSTANT -scope 'script' `
 $packagesPath = 'C:\st\Data\Packages'
 $stPath = 'C:\st\sublime_text.exe'
 
+$fullConsole = "$packagesPath\full_console"
 $outDir = "$packagesPath\User\UnitTesting\$PackageToTest"
 $outFile = "$outDir\result"
 $coverageFile = "$outDir\coverage"
 [void] (new-item -itemtype file $outFile -force)
+
+function displayTheFullConsoleFile() {
+    logVerbose ""
+    logVerbose ""
+
+    if (test-path "$fullConsole") {
+        $copy = "$fullConsole.copy"
+        copy-item $fullConsole -Destination $copy -force
+
+        logVerbose "Full Sublime Text Console output..."
+        $lines = (get-content $copy)
+        write-output $lines
+    } else {
+        write-verbose "Log file not found on: $fullConsole"
+    }
+}
 
 remove-item $outFile -force -erroraction silentlycontinue
 
@@ -73,24 +90,43 @@ if (-not (test-path $schedule_target)) {
     copy-item $schedule_source $schedule_target -force
 }
 
-# launch sublime
-$sublimeIsRunning = get-process 'sublime_text' -erroraction silentlycontinue
+function startSublimeText() {
+    # launch sublime
+    $sublimeIsRunning = get-process 'sublime_text' -erroraction silentlycontinue
+    write-host "Is sublime text running: $sublimeIsRunning"
 
-# XXX(guillermooo): we cannot start the editor minimized?
-if($sublimeIsRunning -eq $null) {
-    start-process $stPath
+    # XXX(guillermooo): we cannot start the editor minimized?
+    if($sublimeIsRunning -eq $null) {
+        start-process $stPath
+    }
 }
 
+startSublimeText
 $startTime = get-date
+Get-WmiObject win32_processor
+
 while (-not (test-path $outFile) -or (get-item $outFile).length -eq 0) {
-    write-host -nonewline "."
+    startSublimeText
+
+    Get-WmiObject win32_processor | select LoadPercentage
+    Get-WmiObject Win32_PerfFormattedData_PerfProc_Process `
+        | Where-Object { $_.name -inotmatch '_total|idle' } `
+        | ForEach-Object {
+            "Process = {0,-25} CPU_Usage = {1,-12} Memory_Usage(MB) = {2,-16}" -f `
+                $_.Name,$_.PercentProcessorTime,([math]::Round($_.WorkingSetPrivate/1Mb,2))
+        }
+
     if (((get-date) - $startTime).totalseconds -ge 60) {
         write-host
         if (test-path $schedule_target) {
             remove-item $schedule_target -force
         }
+        displayTheFullConsoleFile
+        write-output ""
+        write-output ""
         throw "Timeout: Sublime Text is not responding."
     }
+
     start-sleep -seconds 1
 }
 write-host
@@ -100,6 +136,8 @@ write-verbose "start to read output"
 $copy = "$outfile.copy"
 $read = 0
 $done = $false
+$startTime = get-date
+
 while ($true) {
     # XXX(guillermooo): We can't open a file already opened by another
     # process. By copying the file first, we can work around this. (But if
@@ -108,6 +146,11 @@ while ($true) {
     # from an already opened file. Perhaps it uses the same workaround as we
     # do here?
     copy-item $outfile $copy -force
+
+    # Bail out if more than 10 minutes passed
+    if (((get-date) - $startTime).totalseconds -ge 600) {
+        break
+    }
 
     $lines = (get-content $copy)
     $lines = $lines | select-object -skip $read
@@ -147,6 +190,10 @@ if (test-path $schedule_target) {
     remove-item $schedule_target -force
 }
 
+displayTheFullConsoleFile
+
 if (!$success) {
-    throw
+    write-output ""
+    write-output ""
+    throw "The Unit Texts execution was not successful!"
 }
