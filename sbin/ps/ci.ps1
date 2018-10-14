@@ -69,25 +69,28 @@ $fullConsoleDebugToolsFullConsolePackage = "0_0full_console_output.sublime-packa
 $debugToolsConsoleScript = @"
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
 import sys
 import time
 import threading
 
 from DebugTools.all.debug_tools import getLogger
-log = getLogger("full_console_output", file=r"$fullConsoleDebugToolsFullConsoleOutput", stdout=True)
+log = getLogger('full_console_output', file=r'$fullConsoleDebugToolsFullConsoleOutput', stdout=True)
 
-print("")
-print("Testing print")
-sys.stderr.write("Testing sys.stderr for %s\n" % r"$fullConsoleDebugToolsFullConsoleOutput")
-sys.stdout.write("Testing sys.stdout for %s\n" % r"$fullConsoleDebugToolsFullConsoleOutput")
+print('')
+log(1, 'Sublime Text has just started...')
+log(1, 'Starting Capturing the Sublime Text Console...')
+sys.stderr.write('Testing sys.stderr for %s\n' % r'$fullConsoleDebugToolsFullConsoleOutput')
+sys.stdout.write('Testing sys.stdout for %s\n' % r'$fullConsoleDebugToolsFullConsoleOutput')
 
-log(1, "TESTING!")
-log(1, "TESTING! logfile to: %s", r"$fullConsoleDebugToolsFullConsoleOutput")
+log(1, 'TESTING!')
+log(1, 'TESTING! logfile to: %s', r'$fullConsoleDebugToolsFullConsoleOutput')
+log(1, 'TESTING! logfile from: %s', os.path.abspath(__file__))
 
 def time_passing():
 
     while(True):
-        log(1, "The time is passing...")
+        log(1, 'The time is passing...')
         time.sleep(1)
 
 thread = threading.Thread( target=time_passing )

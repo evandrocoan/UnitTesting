@@ -19,6 +19,7 @@ import time
 # todo: allow different sublime versions
 
 PACKAGES_DIR_PATH = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..'))
+FULL_CONSOLE_PATH = os.path.join(PACKAGES_DIR_PATH, 'full_console')
 UT_OUTPUT_DIR_PATH = os.path.realpath(os.path.join(PACKAGES_DIR_PATH, 'User', 'UnitTesting'))
 SCHEDULE_FILE_PATH = os.path.realpath(os.path.join(UT_OUTPUT_DIR_PATH, 'schedule.json'))
 UT_DIR_PATH = os.path.realpath(os.path.join(PACKAGES_DIR_PATH, 'UnitTesting'))
@@ -107,6 +108,7 @@ def start_sublime_text():
 def read_output(path):
     # todo: use notification instead of polling
     success = None
+    start_time = time.time()
 
     def check_is_success(result):
         try:
@@ -134,6 +136,9 @@ def read_output(path):
                 f.seek(offset)
 
             time.sleep(0.2)
+
+            if time.time() - start_time > 600:
+                break
 
     return success
 
@@ -206,4 +211,18 @@ if __name__ == '__main__':
         'coverage': coverage,
     }
 
-    main(default_schedule_info)
+    try:
+        main(default_schedule_info)
+
+    finally:
+        print("")
+        print("")
+
+        if(os.path.exists(FULL_CONSOLE_PATH)):
+            print("Full Sublime Text Console output...")
+
+            with open(FULL_CONSOLE_PATH, "r") as file:
+                contents = file.read()
+                print(contents)
+        else:
+            print("Log file not found on: %s" % FULL_CONSOLE_PATH)

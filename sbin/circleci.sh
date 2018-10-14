@@ -34,7 +34,7 @@ Bootstrap() {
         fi
 
         if [ ! -z $DEBUG_TOOLS_TAG ]; then
-            DEBUG_TOOLS_TAG=--branch $DEBUG_TOOLS_TAG
+            DEBUG_TOOLS_TAG="--branch $DEBUG_TOOLS_TAG"
         fi
 
         echo "download DebugTools tag: $DEBUG_TOOLS_TAG, $DEBUG_TOOLS_URL $DEBUG_TOOLS_PATH"
@@ -50,15 +50,8 @@ Bootstrap() {
             UT_URL="https://github.com/randy3k/UnitTesting"
         fi
 
-        if [ -z $UNITTESTING_TAG ]; then
-            if [ $SUBLIME_TEXT_VERSION -eq 2 ]; then
-                UNITTESTING_TAG="0.10.6"
-            elif [ $SUBLIME_TEXT_VERSION -eq 3 ]; then
-                # latest tag
-                UNITTESTING_TAG=$(git ls-remote --tags "$UT_URL" |
-                      sed 's|.*/\(.*\)$|\1|' | grep -v '\^' |
-                      sort -t. -k1,1nr -k2,2nr -k3,3nr | head -n1)
-            fi
+        if [ ! -z $UNITTESTING_TAG ]; then
+            UNITTESTING_TAG="--branch $UNITTESTING_TAG"
         fi
 
         echo "download UnitTesting tag: $UNITTESTING_TAG"
@@ -85,6 +78,59 @@ Bootstrap() {
         echo
     fi
 
+    SublimeTextInstalledPackagesDirectory="$STP/../Installed Packages"
+    fullConsoleDebugToolsFullConsoleOutput="$STP/full_console"
+    fullConsoleDebugToolsFullConsoleScript="$STP/../0_0full_console_output.py"
+    fullConsoleDebugToolsFullConsoleZip="$SublimeTextInstalledPackagesDirectory/0_0full_console_output.zip"
+    fullConsoleDebugToolsFullConsolePackage="$SublimeTextInstalledPackagesDirectory/0_0full_console_output.sublime-package"
+
+    debugToolsConsoleScript="\
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+import os
+import sys
+import time
+import threading
+
+from DebugTools.all.debug_tools import getLogger
+log = getLogger('full_console_output', file=r'$fullConsoleDebugToolsFullConsoleOutput', stdout=True)
+
+print('')
+log(1, 'Sublime Text has just started...')
+log(1, 'Starting Capturing the Sublime Text Console...')
+sys.stderr.write('Testing sys.stderr for %s\n' % r'$fullConsoleDebugToolsFullConsoleOutput')
+sys.stdout.write('Testing sys.stdout for %s\n' % r'$fullConsoleDebugToolsFullConsoleOutput')
+
+log(1, 'TESTING!')
+log(1, 'TESTING! logfile to: %s', r'$fullConsoleDebugToolsFullConsoleOutput')
+log(1, 'TESTING! logfile from: %s', os.path.abspath(__file__))
+
+def time_passing():
+
+    while(True):
+        log(1, 'The time is passing...')
+        time.sleep(1)
+
+thread = threading.Thread( target=time_passing )
+thread.start()
+"
+
+    mkdir -p "$SublimeTextInstalledPackagesDirectory"
+
+    printf 'Start capturing all Sublime Text console with DebugTools: %s\n' "$fullConsoleDebugToolsFullConsoleScript"
+    printf "%s\n" "$debugToolsConsoleScript" > "$fullConsoleDebugToolsFullConsoleScript"
+    tail -100 "$fullConsoleDebugToolsFullConsoleScript"
+
+    printf 'Create it as Packed file because they are loaded first by Sublime Text\n'
+    zip -v -j "$fullConsoleDebugToolsFullConsoleZip" "$fullConsoleDebugToolsFullConsoleScript"
+
+    printf 'Renaming the zip file to %s\n' "$fullConsoleDebugToolsFullConsolePackage"
+    mv "$fullConsoleDebugToolsFullConsoleZip" "$fullConsoleDebugToolsFullConsolePackage"
+
+    printf '\n'
+    unzip -v "$fullConsoleDebugToolsFullConsolePackage"
+
+    printf '\n'
     sh "$STP/UnitTesting/sbin/install_sublime_text.sh"
 }
 
