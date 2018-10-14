@@ -26,6 +26,19 @@ Bootstrap() {
     # https://stackoverflow.com/questions/36794501
     git config --global advice.detachedHead false
 
+    DEBUG_TOOLS_PATH="$STP/DebugTools"
+    if [ ! -d "$DEBUG_TOOLS_PATH" ]; then
+
+        if [ -z $DEBUG_TOOLS_URL ]; then
+            DEBUG_TOOLS_URL="https://github.com/evandrocoan/DebugTools"
+        fi
+
+        echo "download DebugTools tag: $DEBUG_TOOLS_TAG, $DEBUG_TOOLS_URL $DEBUG_TOOLS_PATH"
+        git clone --depth 1 "$DEBUG_TOOLS_TAG" "$DEBUG_TOOLS_URL" "$DEBUG_TOOLS_PATH"
+        git -C "$DEBUG_TOOLS_PATH" rev-parse HEAD
+        echo
+    fi
+
     UT_PATH="$STP/UnitTesting"
     if [ ! -d "$UT_PATH" ]; then
 

@@ -13,6 +13,12 @@ def plugin_loaded():
         "0_install_package_control_helper",
         "log")
 
+    from DebugTools.all.debug_tools import getLogger
+    log = getLogger(__file__, file=logfile, stdout=True)
+
+    log(1, "TESTING!")
+    log(1, "TESTING! logfile to: %s", logfile)
+
     def kill_subl(restart=False):
         if sublime.platform() == "osx":
             cmd = "sleep 1; killall 'Sublime Text'; sleep 1; "
@@ -58,15 +64,14 @@ def plugin_loaded():
             def finish(self, installed_packages, found_packages, found_dependencies):
                 missing_dependencies = required_dependencies - set(found_dependencies)
 
-                if len(missing_dependencies) == 0 or len(missing_dependencies) == 1 and 'coverage' in missing_dependencies:
+                if len(missing_dependencies) == 0:
                     touch("success")
                     kill_subl()
                 else:
-                    with open(logfile, "a") as f:
-                        f.write("Unit Testing pc_helper(), missing dependencies: %s\n" % missing_dependencies)
-                        f.write("required_dependencies: %s\n" % required_dependencies)
-                        f.write("found_dependencies: %s\n" % found_dependencies)
-                        f.write("'coverage' in missing_dependencies: %s\n" % str('coverage' in missing_dependencies))
+                    print("Unit Testing pc_helper(), missing dependencies: %s" % missing_dependencies)
+                    print("required_dependencies: %s" % required_dependencies)
+                    print("found_dependencies: %s" % found_dependencies)
+                    print("'coverage' in missing_dependencies: %s" % str('coverage' in missing_dependencies))
                     sublime.set_timeout(_check_dependencies, 5000)
 
         def _check_dependencies():
@@ -82,9 +87,7 @@ def plugin_loaded():
     else:
         # restart sublime when `sublime.error_message` is run
         def error_message(message):
-            with open(logfile, "a") as f:
-                f.write(message + "\n")
-
+            print(message)
             kill_subl(True)
 
         sublime.error_message = error_message

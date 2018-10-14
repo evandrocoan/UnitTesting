@@ -86,6 +86,15 @@ function Bootstrap {
         logVerbose ""
     }
 
+    # Clone DebugTools into Packages/DebugTools.
+    if (pathExists -Negate $DebugToolsSublimeTextPackagesDirectory) {
+        logVerbose "download DebugTools tag: $DEBUG_TOOLS_TAG"
+        cloneRepository $env:DEBUG_TOOLS_TAG $DebugToolsRepositoryUrl $DebugToolsSublimeTextPackagesDirectory
+        logVerbose "SUCCESSFULLY CLONED DEBUG TOOLS!"
+        gitGetHeadRevisionName $DebugToolsSublimeTextPackagesDirectory | logVerbose
+        logVerbose ""
+    }
+
     # Clone coverage plugin into Packages/coverage.
     installPackageForSublimeTextVersion3IfNotPresent $CoverageSublimeTextPackagesDirectory $env:COVERAGE_TAG $CoverageRepositoryUrl
 

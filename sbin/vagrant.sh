@@ -35,6 +35,10 @@ Provision() {
         ln -s /vagrant $STP/$PACKAGE
     fi
 
+    if [ ! -d $STP/DebugTools ]; then
+        git clone https://github.com/evandrocoan/DebugTools $STP/DebugTools
+    fi
+
     if [ ! -d $STP/UnitTesting ]; then
         git clone https://github.com/randy3k/UnitTesting $STP/UnitTesting
     fi
