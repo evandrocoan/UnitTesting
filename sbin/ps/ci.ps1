@@ -36,7 +36,9 @@ param(
     [Parameter(Mandatory = $false, Position = 1)]
     [string]$package_url,
     [Parameter(Mandatory = $false, Position = 2)]
-    [string]$package_name
+    [string]$package_name,
+    [Parameter(Mandatory = $false, Position = 3)]
+    [string]$package_tag
 )
 
 # Stop execution on any error. PS default is to continue on non-terminating errors.
@@ -79,8 +81,8 @@ function Bootstrap {
         # $UNITTESTING_TAG = getLatestUnitTestingBuildTag $env:UNITTESTING_TAG $SublimeTextVersion $UnitTestingRepositoryUrl
         # logVerbose "download UnitTesting tag: $UNITTESTING_TAG"
         # gitCloneTag $UNITTESTING_TAG $UnitTestingRepositoryUrl $UnitTestingSublimeTextPackagesDirectory
-        logVerbose "download UnitTesting tag: $env:UNITTESTING_TAG"
-        cloneRepository $env:UNITTESTING_TAG $UnitTestingRepositoryUrl $UnitTestingSublimeTextPackagesDirectory
+        logVerbose "download UnitTesting: $UnitTestingRepositoryUrl $UnitTestingSublimeTextPackagesDirectory $env:UNITTESTING_TAG"
+        cloneRepository $UnitTestingRepositoryUrl $UnitTestingSublimeTextPackagesDirectory $env:UNITTESTING_TAG
         logVerbose "SUCCESSFULLY CLONED UNITTESTING!"
         gitGetHeadRevisionName $UnitTestingSublimeTextPackagesDirectory | logVerbose
         logVerbose ""
@@ -88,8 +90,8 @@ function Bootstrap {
 
     # Clone DebugTools into Packages/DebugTools.
     if (pathExists -Negate $DebugToolsSublimeTextPackagesDirectory) {
-        logVerbose "download DebugTools tag: $DEBUG_TOOLS_TAG"
-        cloneRepository $env:DEBUG_TOOLS_TAG $DebugToolsRepositoryUrl $DebugToolsSublimeTextPackagesDirectory
+        logVerbose "download DebugTools: $DebugToolsRepositoryUrl $DebugToolsSublimeTextPackagesDirectory $env:DEBUG_TOOLS_TAG"
+        cloneRepository $DebugToolsRepositoryUrl $DebugToolsSublimeTextPackagesDirectory $env:DEBUG_TOOLS_TAG
         logVerbose "SUCCESSFULLY CLONED DEBUG TOOLS!"
         gitGetHeadRevisionName $DebugToolsSublimeTextPackagesDirectory | logVerbose
         logVerbose ""
@@ -127,9 +129,9 @@ function RunTests {
 
 function CloneGitPackage {
     $PACKAGE_PATH = "$SublimeTextPackagesDirectory\$package_name"
-    logVerbose "Downloading package: $package_url $PACKAGE_PATH"
+    logVerbose "Downloading package: $package_url $PACKAGE_PATH $package_tag"
 
-    cloneRepository $package_url $PACKAGE_PATH
+    cloneRepository $package_url "$PACKAGE_PATH" $package_tag
     logVerbose ""
 }
 

@@ -118,11 +118,15 @@ function cloneRepositoryTag {
 }
 
 function cloneRepository {
-    param([string]$RepositoryUrl, [string]$Destination)
-    logVerbose "cloning $RepositoryUrl into $Destination..."
-    gitClone $RepositoryUrl $Destination
-    gitGetHeadRevisionName $Destination | logVerbose
-    logVerbose ""
+    param([string]$RepositoryUrl, [string]$Destination, [string]$RepositoryTag)
+    logVerbose "cloning url $RepositoryUrl, tag '$RepositoryTag' into $Destination..."
+    if ([string]::IsNullOrEmpty($RepositoryTag)) {
+        gitClone $RepositoryUrl $Destination
+        gitGetHeadRevisionName $Destination | logVerbose
+        logVerbose ""
+    } else {
+        cloneRepositoryTag $RepositoryTag $RepositoryUrl $RepositoryDirectory
+    }
 }
 
 function getLatestColorSchemeUnitTag {

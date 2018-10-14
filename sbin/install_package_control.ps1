@@ -39,11 +39,13 @@ try{
         }
     }
 
+    if (test-path "$PCH_PATH\log") {
+        get-content -Path "$PCH_PATH\log"
+    } else {
+        write-verbose "Log file not found on: $PCH_PATH\log"
+    }
+
     if (-not (test-path "$PCH_PATH\success")) {
-        if (test-path "$PCH_PATH\log") {
-            get-content -Path "$PCH_PATH\log"
-        }
-        remove-item "$PCH_PATH" -Recurse -Force
         throw "Timeout: Fail to install PackagesManager."
     }
 

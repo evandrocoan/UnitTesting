@@ -65,7 +65,7 @@ if (!$env:UNITTESTING_BOOTSTRAPPED) {
     makeGlobalConstant ColorSchemeUnitSublimeTextPackagesDirectory (join-path $SublimeTextPackagesDirectory 'ColorSchemeUnit')
     makeGlobalConstant CoverageRepositoryUrl "https://github.com/codexns/sublime-coverage"
     makeGlobalConstant CoverageSublimeTextPackagesDirectory (join-path $SublimeTextPackagesDirectory 'coverage')
-    makeGlobalConstant DebugToolsRepositoryUrl "https://github.com/evandrocoanr/DebugTools"
+    makeGlobalConstant DebugToolsRepositoryUrl "https://github.com/evandrocoan/DebugTools"
     makeGlobalConstant DebugToolsSublimeTextPackagesDirectory (join-path $SublimeTextPackagesDirectory 'DebugTools')
     makeGlobalConstant KeyPressRepositoryUrl "https://github.com/randy3k/Keypress"
     makeGlobalConstant KeyPressSublimeTextPackagesDirectory (join-path $SublimeTextPackagesDirectory 'Keypress')

@@ -38,6 +38,10 @@ Bootstrap() {
             DEBUG_TOOLS_URL="https://github.com/evandrocoan/DebugTools"
         fi
 
+        if [ ! -z $DEBUG_TOOLS_TAG ]; then
+            DEBUG_TOOLS_TAG=--branch $DEBUG_TOOLS_TAG
+        fi
+
         echo "download DebugTools tag: $DEBUG_TOOLS_TAG, $DEBUG_TOOLS_URL $DEBUG_TOOLS_PATH"
         git clone --depth 1 $DEBUG_TOOLS_TAG "$DEBUG_TOOLS_URL" "$DEBUG_TOOLS_PATH"
         git -C "$DEBUG_TOOLS_PATH" rev-parse HEAD
@@ -51,15 +55,8 @@ Bootstrap() {
             UT_URL="https://github.com/evandroforks/UnitTesting"
         fi
 
-        if [ -z $UNITTESTING_TAG ]; then
-            if [ $SUBLIME_TEXT_VERSION -eq 2 ]; then
-                UNITTESTING_TAG="0.10.6"
-            elif [ $SUBLIME_TEXT_VERSION -eq 3 ]; then
-                # latest tag
-                UNITTESTING_TAG=$(git ls-remote --tags "$UT_URL" |
-                      sed 's|.*/\(.*\)$|\1|' | grep '^[0-9]*\.[0-9]*\.[0-9]*$' |
-                      sort -t. -k1,1nr -k2,2nr -k3,3nr | head -n1)
-            fi
+        if [ ! -z $UNITTESTING_TAG ]; then
+            UNITTESTING_TAG=--branch $UNITTESTING_TAG
         fi
 
         echo "download UnitTesting tag: $UNITTESTING_TAG, $UT_URL $UT_PATH"

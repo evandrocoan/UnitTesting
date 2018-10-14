@@ -75,12 +75,14 @@ for i in {1..2}; do
     [ -f "$PCH_PATH/success" ] && break
 done
 
+if [ -f "$PCH_PATH/log" ]; then
+    cat "$PCH_PATH/log"
+else
+    echo "Log file not found on: $PCH_PATH/log"
+fi
+
 if [ ! -f "$PCH_PATH/success" ]; then
-    if [ -f "$PCH_PATH/log" ]; then
-        cat "$PCH_PATH/log"
-    fi
     echo "Timeout: Fail to install PackagesManager."
-    rm -rf "$PCH_PATH"
     exit 1
 fi
 

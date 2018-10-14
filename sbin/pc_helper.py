@@ -14,7 +14,7 @@ def plugin_loaded():
         "log")
 
     from DebugTools.all.debug_tools import getLogger
-    log = getLogger(__file__, file=logfile, stdout=True)
+    log = getLogger("UnitTesting.sbin.pc_helper", file=logfile, stdout=True)
 
     log(1, "TESTING!")
     log(1, "TESTING! logfile to: %s", logfile)
