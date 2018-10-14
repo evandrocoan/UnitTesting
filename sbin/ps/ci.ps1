@@ -79,8 +79,9 @@ function Bootstrap {
         # $UNITTESTING_TAG = getLatestUnitTestingBuildTag $env:UNITTESTING_TAG $SublimeTextVersion $UnitTestingRepositoryUrl
         # logVerbose "download UnitTesting tag: $UNITTESTING_TAG"
         # gitCloneTag $UNITTESTING_TAG $UnitTestingRepositoryUrl $UnitTestingSublimeTextPackagesDirectory
-        cloneRepository $UnitTestingRepositoryUrl $UnitTestingSublimeTextPackagesDirectory
-        logVerbose "SUCCESSFULLY CLONED!"
+        logVerbose "download UnitTesting tag: $env:UNITTESTING_TAG"
+        cloneRepository $env:UNITTESTING_TAG $UnitTestingRepositoryUrl $UnitTestingSublimeTextPackagesDirectory
+        logVerbose "SUCCESSFULLY CLONED UNITTESTING!"
         gitGetHeadRevisionName $UnitTestingSublimeTextPackagesDirectory | logVerbose
         logVerbose ""
     }
