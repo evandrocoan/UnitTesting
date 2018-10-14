@@ -86,11 +86,13 @@ else
         for i in {1..20}; do
             curl "$URL" -o ~/sublimetext.tar.bz2 && break || sleep 3
         done
-        tar jxfv ~/sublimetext.tar.bz2 -C ~/
+        tar jxf ~/sublimetext.tar.bz2 -C ~/
         mkdir -p $HOME/.local/bin
         ln -sf "$HOME/$SUBLIME_TEXT/sublime_text" $HOME/.local/bin/subl
 
         # make `subl` available
+        echo "Successfully installed Sublime Text"
+        echo
         "$HOME/$SUBLIME_TEXT/sublime_text" &
         sleep 2
         pkill sublime_text
