@@ -148,7 +148,7 @@ while ($true) {
     copy-item $outfile $copy -force
 
     # Bail out if more than 10 minutes passed
-    if (((get-date) - $startTime).totalseconds -ge 600) {
+    if (((get-date) - $startTime).totalseconds -ge 1000) {
         break
     }
 

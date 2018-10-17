@@ -137,7 +137,7 @@ def read_output(path):
 
             time.sleep(0.2)
 
-            if time.time() - start_time > 600:
+            if time.time() - start_time > 1000:
                 break
 
     return success
