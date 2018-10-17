@@ -19,7 +19,6 @@ import time
 # todo: allow different sublime versions
 
 PACKAGES_DIR_PATH = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..'))
-FULL_CONSOLE_PATH = os.path.join(PACKAGES_DIR_PATH, 'full_console')
 UT_OUTPUT_DIR_PATH = os.path.realpath(os.path.join(PACKAGES_DIR_PATH, 'User', 'UnitTesting'))
 SCHEDULE_FILE_PATH = os.path.realpath(os.path.join(UT_OUTPUT_DIR_PATH, 'schedule.json'))
 UT_DIR_PATH = os.path.realpath(os.path.join(PACKAGES_DIR_PATH, 'UnitTesting'))
@@ -211,18 +210,4 @@ if __name__ == '__main__':
         'coverage': coverage,
     }
 
-    try:
-        main(default_schedule_info)
-
-    finally:
-        print("")
-        print("")
-
-        if(os.path.exists(FULL_CONSOLE_PATH)):
-            print("Full Sublime Text Console output...")
-
-            with open(FULL_CONSOLE_PATH, "r") as file:
-                contents = file.read()
-                print(contents)
-        else:
-            print("Log file not found on: %s" % FULL_CONSOLE_PATH)
+    main(default_schedule_info)

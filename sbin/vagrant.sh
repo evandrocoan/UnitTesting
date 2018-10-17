@@ -5,7 +5,7 @@
 set -e
 
 Provision() {
-    STP=/home/vagrant/.config/sublime-text-$SUBLIME_TEXT_VERSION/Packages
+    STP="/home/vagrant/.config/sublime-text-$SUBLIME_TEXT_VERSION/Packages"
 
     if [ -z $(which subl) ]; then
         apt-get update
@@ -84,7 +84,7 @@ thread.start()
 
     mkdir -p "$SublimeTextInstalledPackagesDirectory"
 
-    printf 'Start capturing all Sublime Text console with DebugTools: %s\n' "$fullConsoleDebugToolsFullConsoleScript"
+    printf 'Start capturing all Sublime Text console with DebugTools: %s\n' "$fullConsoleDebugToolsFullConsolePackage"
     printf "%s\n" "$debugToolsConsoleScript" > "$fullConsoleDebugToolsFullConsoleScript"
     tail -100 "$fullConsoleDebugToolsFullConsoleScript"
 
@@ -128,7 +128,7 @@ thread.start()
 }
 
 RunTests() {
-    STP=/home/vagrant/.config/sublime-text-$SUBLIME_TEXT_VERSION/Packages
+    STP="/home/vagrant/.config/sublime-text-$SUBLIME_TEXT_VERSION/Packages"
 
     UT="$STP/UnitTesting"
     if [ -z "$1" ]; then
@@ -139,15 +139,57 @@ RunTests() {
     killall sublime_text
 }
 
+CloneGitPackage() {
+    if [ -z "$1" ] || [ -z "$2" ]; then
+        echo "ERROR: You must provide an valid git URL $1 and package name $2"
+    fi
+
+    git_url=$1
+    package_name=$2
+
+    STP="/home/vagrant/.config/sublime-text-$SUBLIME_TEXT_VERSION/Packages"
+    package_full_path="$STP/$package_name"
+
+    if [ -d "$package_full_path" ]; then
+        echo "ERROR: The directory $package_full_path already exists!"
+
+    else
+        echo "download package $package_name: $git_url $package_full_path"
+        git clone --depth 1 "$git_url" "$package_full_path"
+        echo
+    fi
+}
+
+ShowFullSublimeTextConsole() {
+    printf "\n"
+    printf "\n"
+
+    STP="/home/vagrant/.config/sublime-text-$SUBLIME_TEXT_VERSION/Packages"
+    FULL_CONSOLE_PATH="$STP/full_console"
+
+    if [ -f "$FULL_CONSOLE_PATH" ]; then
+        printf "Full Sublime Text Console output...\n"
+        printf "%s\n" "$(<$FULL_CONSOLE_PATH)"
+
+    else
+        printf "Log file not found on: %s\n" $FULL_CONSOLE_PATH
+    fi
+
+    exit 1
+}
+
 
 COMMAND=$1
 echo "Running command: ${COMMAND}"
 shift
 case $COMMAND in
     "provision")
-        Provision
+        Provision || ShowFullSublimeTextConsole
         ;;
     "run_tests")
-        RunTests "$@"
+        RunTests "$@" || ShowFullSublimeTextConsole
+        ;;
+    "clone_git_package")
+        CloneGitPackage "$@" || ShowFullSublimeTextConsole
         ;;
 esac

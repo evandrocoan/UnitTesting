@@ -8,6 +8,8 @@ else
     STP="$HOME/.config/sublime-text-$SUBLIME_TEXT_VERSION/Packages"
 fi
 
+FULL_CONSOLE_PATH="$STP/full_console"
+
 Bootstrap() {
     if [ "$PACKAGE" = "__all__" ]; then
         echo "copy all subfolders to sublime package directory"
@@ -117,7 +119,7 @@ thread.start()
 
     mkdir -p "$SublimeTextInstalledPackagesDirectory"
 
-    printf 'Start capturing all Sublime Text console with DebugTools: %s\n' "$fullConsoleDebugToolsFullConsoleScript"
+    printf 'Start capturing all Sublime Text console with DebugTools: %s\n' "$fullConsoleDebugToolsFullConsolePackage"
     printf "%s\n" "$debugToolsConsoleScript" > "$fullConsoleDebugToolsFullConsoleScript"
     tail -100 "$fullConsoleDebugToolsFullConsoleScript"
 
@@ -193,33 +195,70 @@ RunTests() {
     sleep 2
 }
 
+CloneGitPackage() {
+    if [ -z "$1" ] || [ -z "$2" ]; then
+        echo "ERROR: You must provide an valid git URL $1 and package name $2"
+    fi
+
+    git_url=$1
+    package_name=$2
+    package_full_path="$STP/$package_name"
+
+    if [ -d "$package_full_path" ]; then
+        echo "ERROR: The directory $package_full_path already exists!"
+
+    else
+        echo "download package $package_name: $git_url $package_full_path"
+        git clone --depth 1 "$git_url" "$package_full_path"
+        echo
+    fi
+}
+
+ShowFullSublimeTextConsole() {
+    printf "\n"
+    printf "\n"
+
+    if [ -f "$FULL_CONSOLE_PATH" ]; then
+        printf "Full Sublime Text Console output...\n"
+        printf "%s\n" "$(<$FULL_CONSOLE_PATH)"
+
+    else
+        printf "Log file not found on: %s\n" $FULL_CONSOLE_PATH
+    fi
+
+    exit 1
+}
+
 
 COMMAND=$1
 shift
 echo "Running command: ${COMMAND} $@"
 case $COMMAND in
     "bootstrap")
-        Bootstrap "$@"
+        Bootstrap "$@" || ShowFullSublimeTextConsole
         ;;
     "install_package_control")
-        InstallPackageControl "$@"
+        InstallPackageControl "$@" || ShowFullSublimeTextConsole
         ;;
     "install_color_scheme_unit")
-        InstallColorSchemeUnit "$@"
+        InstallColorSchemeUnit "$@" || ShowFullSublimeTextConsole
         ;;
     "install_keypress")
-        InstallKeypress "$@"
+        InstallKeypress "$@" || ShowFullSublimeTextConsole
         ;;
     "run_tests")
-        RunTests "$@"
+        RunTests "$@" || ShowFullSublimeTextConsole
         ;;
     "run_syntax_tests")
-        RunTests "--syntax-test" "$@"
+        RunTests "--syntax-test" "$@" || ShowFullSublimeTextConsole
         ;;
     "run_syntax_compatibility")
-        RunTests "--syntax-compatibility" "$@"
+        RunTests "--syntax-compatibility" "$@" || ShowFullSublimeTextConsole
         ;;
     "run_color_scheme_tests")
-        RunTests "--color-scheme-test" "$@"
+        RunTests "--color-scheme-test" "$@" || ShowFullSublimeTextConsole
+        ;;
+    "clone_git_package")
+        CloneGitPackage "$@" || ShowFullSublimeTextConsole
         ;;
 esac

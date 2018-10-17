@@ -8,6 +8,8 @@ else
     STP="$HOME/.config/sublime-text-$SUBLIME_TEXT_VERSION/Packages"
 fi
 
+FULL_CONSOLE_PATH="$STP/full_console"
+
 Bootstrap() {
     if [ "$TRAVIS_OS_NAME" = "linux" ] && [ -z $DISPLAY ]; then
         echo "Xvfb is not running"
@@ -122,7 +124,7 @@ thread.start()
 
     mkdir -p "$SublimeTextInstalledPackagesDirectory"
 
-    printf 'Start capturing all Sublime Text console with DebugTools: %s\n' "$fullConsoleDebugToolsFullConsoleScript"
+    printf 'Start capturing all Sublime Text console with DebugTools: %s\n' "$fullConsoleDebugToolsFullConsolePackage"
     printf "%s\n" "$debugToolsConsoleScript" > "$fullConsoleDebugToolsFullConsoleScript"
     tail -100 "$fullConsoleDebugToolsFullConsoleScript"
 
@@ -214,36 +216,51 @@ CloneGitPackage() {
     fi
 }
 
+ShowFullSublimeTextConsole() {
+    printf "\n"
+    printf "\n"
+
+    if [ -f "$FULL_CONSOLE_PATH" ]; then
+        printf "Full Sublime Text Console output...\n"
+        printf "%s\n" "$(<$FULL_CONSOLE_PATH)"
+
+    else
+        printf "Log file not found on: %s\n" $FULL_CONSOLE_PATH
+    fi
+
+    exit 1
+}
+
 
 COMMAND=$1
 shift
 echo "Running command: ${COMMAND} $@"
 case $COMMAND in
     "bootstrap")
-        Bootstrap "$@"
+        Bootstrap "$@" || ShowFullSublimeTextConsole
         ;;
     "install_package_control")
-        InstallPackageControl "$@"
+        InstallPackageControl "$@" || ShowFullSublimeTextConsole
         ;;
     "install_color_scheme_unit")
-        InstallColorSchemeUnit "$@"
+        InstallColorSchemeUnit "$@" || ShowFullSublimeTextConsole
         ;;
     "install_keypress")
-        InstallKeypress "$@"
+        InstallKeypress "$@" || ShowFullSublimeTextConsole
         ;;
     "run_tests")
-        RunTests "$@"
+        RunTests "$@" || ShowFullSublimeTextConsole
         ;;
     "run_syntax_tests")
-        RunTests "--syntax-test" "$@"
+        RunTests "--syntax-test" "$@" || ShowFullSublimeTextConsole
         ;;
     "run_syntax_compatibility")
-        RunTests "--syntax-compatibility" "$@"
+        RunTests "--syntax-compatibility" "$@" || ShowFullSublimeTextConsole
         ;;
     "run_color_scheme_tests")
-        RunTests "--color-scheme-test" "$@"
+        RunTests "--color-scheme-test" "$@" || ShowFullSublimeTextConsole
         ;;
     "clone_git_package")
-        CloneGitPackage "$@"
+        CloneGitPackage "$@" || ShowFullSublimeTextConsole
         ;;
 esac
