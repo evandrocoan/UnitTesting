@@ -74,7 +74,7 @@ import sys
 import time
 import threading
 
-from DebugTools.all.debug_tools import getLogger
+from debugtools.all.debug_tools import getLogger
 log = getLogger('full_console_output', file=r'$fullConsoleDebugToolsFullConsoleOutput', stdout=True)
 
 print('')
@@ -125,16 +125,16 @@ function Bootstrap {
         logVerbose ""
     }
 
-    # Clone DebugTools into Packages/DebugTools.
+    # Clone debugtools into Packages/debugtools.
     if (pathExists -Negate $DebugToolsSublimeTextPackagesDirectory) {
-        logVerbose "download DebugTools: $DebugToolsRepositoryUrl $DebugToolsSublimeTextPackagesDirectory $env:DEBUG_TOOLS_TAG"
+        logVerbose "download debugtools: $DebugToolsRepositoryUrl $DebugToolsSublimeTextPackagesDirectory $env:DEBUG_TOOLS_TAG"
         cloneRepository $DebugToolsRepositoryUrl $DebugToolsSublimeTextPackagesDirectory $env:DEBUG_TOOLS_TAG
         logVerbose "SUCCESSFULLY CLONED DEBUG TOOLS!"
         gitGetHeadRevisionName $DebugToolsSublimeTextPackagesDirectory | logVerbose
         logVerbose ""
     }
 
-    logVerbose "Start capturing all Sublime Text console with DebugTools"
+    logVerbose "Start capturing all Sublime Text console with debugtools"
     "$debugToolsConsoleScript" | Out-File -FilePath "$fullConsoleDebugToolsFullConsoleScript" -Encoding ASCII
 
     logVerbose "Create it as Packed file because they are loaded first by Sublime Text"

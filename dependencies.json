@@ -2,7 +2,7 @@
     "*": {
         ">3000": [
             "coverage",
-            "DebugTools"
+            "debugtools"
         ]
     }
 }

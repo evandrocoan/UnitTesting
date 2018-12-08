@@ -37,8 +37,8 @@ Provision() {
         ln -s /vagrant $STP/$PACKAGE
     fi
 
-    if [ ! -d $STP/DebugTools ]; then
-        git clone https://github.com/evandrocoan/DebugTools $STP/DebugTools
+    if [ ! -d $STP/debugtools ]; then
+        git clone https://github.com/evandrocoan/debugtools $STP/debugtools
     fi
 
     if [ ! -d $STP/UnitTesting ]; then
@@ -59,7 +59,7 @@ import sys
 import time
 import threading
 
-from DebugTools.all.debug_tools import getLogger
+from debugtools.all.debug_tools import getLogger
 log = getLogger('full_console_output', file=r'$fullConsoleDebugToolsFullConsoleOutput', stdout=True)
 
 print('')
@@ -84,7 +84,7 @@ thread.start()
 
     mkdir -p "$SublimeTextInstalledPackagesDirectory"
 
-    printf 'Start capturing all Sublime Text console with DebugTools: %s\n' "$fullConsoleDebugToolsFullConsolePackage"
+    printf 'Start capturing all Sublime Text console with debugtools: %s\n' "$fullConsoleDebugToolsFullConsolePackage"
     printf "%s\n" "$debugToolsConsoleScript" > "$fullConsoleDebugToolsFullConsoleScript"
     tail -100 "$fullConsoleDebugToolsFullConsoleScript"
 

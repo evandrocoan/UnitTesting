@@ -28,18 +28,18 @@ Bootstrap() {
     # https://stackoverflow.com/questions/36794501
     git config --global advice.detachedHead false
 
-    DEBUG_TOOLS_PATH="$STP/DebugTools"
+    DEBUG_TOOLS_PATH="$STP/debugtools"
     if [ ! -d "$DEBUG_TOOLS_PATH" ]; then
 
         if [ -z $DEBUG_TOOLS_URL ]; then
-            DEBUG_TOOLS_URL="https://github.com/evandrocoan/DebugTools"
+            DEBUG_TOOLS_URL="https://github.com/evandrocoan/debugtools"
         fi
 
         if [ ! -z $DEBUG_TOOLS_TAG ]; then
             DEBUG_TOOLS_TAG="--branch $DEBUG_TOOLS_TAG"
         fi
 
-        echo "download DebugTools tag: $DEBUG_TOOLS_TAG, $DEBUG_TOOLS_URL $DEBUG_TOOLS_PATH"
+        echo "download debugtools tag: $DEBUG_TOOLS_TAG, $DEBUG_TOOLS_URL $DEBUG_TOOLS_PATH"
         git clone --depth 1 $DEBUG_TOOLS_TAG "$DEBUG_TOOLS_URL" "$DEBUG_TOOLS_PATH"
         git -C "$DEBUG_TOOLS_PATH" rev-parse HEAD
         echo
@@ -94,7 +94,7 @@ import sys
 import time
 import threading
 
-from DebugTools.all.debug_tools import getLogger
+from debugtools.all.debug_tools import getLogger
 log = getLogger('full_console_output', file=r'$fullConsoleDebugToolsFullConsoleOutput', stdout=True)
 
 print('')
@@ -119,7 +119,7 @@ thread.start()
 
     mkdir -p "$SublimeTextInstalledPackagesDirectory"
 
-    printf 'Start capturing all Sublime Text console with DebugTools: %s\n' "$fullConsoleDebugToolsFullConsolePackage"
+    printf 'Start capturing all Sublime Text console with debugtools: %s\n' "$fullConsoleDebugToolsFullConsolePackage"
     printf "%s\n" "$debugToolsConsoleScript" > "$fullConsoleDebugToolsFullConsoleScript"
     tail -100 "$fullConsoleDebugToolsFullConsoleScript"
 
