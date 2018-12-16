@@ -1,8 +1,8 @@
 {
     "*": {
         ">3000": [
-            "coverage",
-            "debugtools"
+            "debugtools",
+            "coverage"
         ]
     }
 }
