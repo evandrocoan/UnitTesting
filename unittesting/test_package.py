@@ -46,8 +46,8 @@ class UnitTestingCommand(sublime_plugin.ApplicationCommand, UnitTestingMixin):
             handler = logging.StreamHandler(stream)
             logging.root.addHandler(handler)
 
-        sys.stdout = StdioSplitter(stdout, stream)
-        sys.stderr = StdioSplitter(stderr, stream)
+            sys.stdout = StdioSplitter(stdout, stream)
+            sys.stderr = StdioSplitter(stderr, stream)
 
         testRunner = None
         progress_bar = ProgressBar("Testing %s" % package)
