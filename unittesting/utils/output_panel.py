@@ -31,6 +31,7 @@ class OutputPanel:
         settings.set("scroll_past_end", scroll_past_end)
 
         self.output_view.assign_syntax("Packages/UnitTesting/res/unit-testing-test-result.sublime-syntax")
+        self.output_view.set_read_only(True)
         self.closed = False
 
         self.text_queue_lock = threading.Lock()
@@ -52,9 +53,10 @@ class OutputPanel:
         self.output_view.set_read_only(False)
         self.output_view.run_command(
             'append',
-            {'characters': text, 'force': True, 'scroll_to_end': True}
+            {'characters': text, 'force': True}
         )
         # self.output_view.set_read_only(True)
+        self.output_view.show(self.output_view.size())
 
     def flush(self):
         self._write()
