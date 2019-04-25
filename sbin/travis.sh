@@ -187,10 +187,11 @@ InstallKeypress() {
 
 RunTests() {
     if [ -z "$1" ]; then
-        python "$STP/UnitTesting/sbin/run_tests.py" "$PACKAGE"
+        python "$STP/UnitTesting/sbin/run_tests.py" "$PACKAGE" || exit $?
     else
-        python "$STP/UnitTesting/sbin/run_tests.py" "$@" "$PACKAGE"
+        python "$STP/UnitTesting/sbin/run_tests.py" "$@" "$PACKAGE" || exit $?
     fi
+    printf 'travis.sh SYSTEM EXIT CODE: %s!\n' "${$?}"
 
     pkill "[Ss]ubl" || true
     pkill 'plugin_host' || true
@@ -217,18 +218,19 @@ CloneGitPackage() {
 }
 
 ShowFullSublimeTextConsole() {
-    printf "\n"
-    printf "\n"
+    exit_code="$1"
+    printf '\n'
+    printf '\n'
 
     if [ -f "$FULL_CONSOLE_PATH" ]; then
-        printf "Full Sublime Text Console output...\n"
-        printf "%s\n" "$(<$FULL_CONSOLE_PATH)"
-
+        printf 'The run_tests.py exit code is %s...\n' "${exit_code}"
+        printf 'Full Sublime Text Console output...\n'
+        printf '%s\nEND!\n' "$(cat ${FULL_CONSOLE_PATH})"
     else
-        printf "Log file not found on: %s\n" $FULL_CONSOLE_PATH
+        printf 'Log file not found on: %s\n' "$FULL_CONSOLE_PATH"
     fi
 
-    exit 1
+    exit "${exit_code}"
 }
 
 
@@ -237,30 +239,33 @@ shift
 echo "Running command: ${COMMAND} $@"
 case $COMMAND in
     "bootstrap")
-        Bootstrap "$@" || ShowFullSublimeTextConsole
+        Bootstrap "$@"
         ;;
     "install_package_control")
-        InstallPackageControl "$@" || ShowFullSublimeTextConsole
+        InstallPackageControl "$@"
         ;;
     "install_color_scheme_unit")
-        InstallColorSchemeUnit "$@" || ShowFullSublimeTextConsole
+        InstallColorSchemeUnit "$@"
         ;;
     "install_keypress")
-        InstallKeypress "$@" || ShowFullSublimeTextConsole
+        InstallKeypress "$@"
         ;;
     "run_tests")
-        RunTests "$@" || ShowFullSublimeTextConsole
+        RunTests "$@"
         ;;
     "run_syntax_tests")
-        RunTests "--syntax-test" "$@" || ShowFullSublimeTextConsole
+        RunTests "--syntax-test" "$@"
         ;;
     "run_syntax_compatibility")
-        RunTests "--syntax-compatibility" "$@" || ShowFullSublimeTextConsole
+        RunTests "--syntax-compatibility" "$@"
         ;;
     "run_color_scheme_tests")
-        RunTests "--color-scheme-test" "$@" || ShowFullSublimeTextConsole
+        RunTests "--color-scheme-test" "$@"
         ;;
     "clone_git_package")
-        CloneGitPackage "$@" || ShowFullSublimeTextConsole
+        CloneGitPackage "$@"
+        ;;
+    "show_full_sublime_text_console")
+        ShowFullSublimeTextConsole "$@"
         ;;
 esac

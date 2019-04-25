@@ -13,6 +13,7 @@ import os
 import re
 import shutil
 import subprocess
+import datetime
 import sys
 import time
 
@@ -122,23 +123,31 @@ def read_output(path):
         while True:
             offset = f.tell()
             result = f.read()
-
             print(result, end="")
 
             # Keep checking while we don't have a definite result.
             success = check_is_success(result)
+            final_result = check_is_done(result)
 
-            if check_is_done(result):
+            if final_result:
+                print('Exiting... final test result must not be None!')
+                print('read_output', datetime.datetime.now(), 'success', repr(success),
+                        'final_result', repr(final_result), 'result', repr(result), 'END!')
+
                 assert success is not None, 'final test result must not be None'
                 break
             elif not result:
                 f.seek(offset)
 
             time.sleep(0.2)
+            print('read_output', datetime.datetime.now(), 'success', repr(success),
+                    'final_result', repr(final_result), 'result', repr(result), 'END!')
 
             if time.time() - start_time > 1000:
+                print('Breaking due time limit reached!')
                 break
 
+    print('read_output, success', success)
     return success
 
 
@@ -174,8 +183,10 @@ def main(default_schedule_info):
         print("Wait for tests output...", end="")
         wait_for_output(output_file, SCHEDULE_RUNNER_TARGET)
 
-        print("Start to read output...")
-        if not read_output(output_file):
+        print("Start to read output...", output_file)
+        is_success = read_output(output_file)
+        if not is_success:
+            print("Exiting with error!", is_success, "END!")
             sys.exit(1)
     except ValueError:
         print("Timeout: Could not obtain tests output.")
