@@ -54,7 +54,7 @@ class UnitTestingCommand(sublime_plugin.ApplicationCommand, UnitTestingMixin):
             sys.stdout = StdioSplitter(stdout, stream)
             sys.stderr = StdioSplitter(stderr, stream)
 
-        print('settings:', settings)
+        print('unit_testing, settings:', settings, file=stderr)
         testRunner = None
         progress_bar = ProgressBar("Testing %s" % package)
         progress_bar.start()
