@@ -51,9 +51,9 @@ if (!$env:UNITTESTING_BOOTSTRAPPED) {
     write-output "[UnitTesting] bootstrapping environment..."
 
     # Download scripts for basic operation.
-    invoke-webrequest "https://raw.githubusercontent.com/evandroforks/UnitTesting/master/sbin/ps/ci_config.ps1" -outfile "$UnitTestingPowerShellScriptsDirectory\ci_config.ps1"
-    invoke-webrequest "https://raw.githubusercontent.com/evandroforks/UnitTesting/master/sbin/ps/utils.ps1" -outfile "$UnitTestingPowerShellScriptsDirectory\utils.ps1"
-    invoke-webrequest "https://raw.githubusercontent.com/evandroforks/UnitTesting/master/sbin/ps/ci.ps1" -outfile "$UnitTestingPowerShellScriptsDirectory\ci.ps1"
+    invoke-webrequest "https://raw.githubusercontent.com/evandrocoan/UnitTesting/master/sbin/ps/ci_config.ps1" -outfile "$UnitTestingPowerShellScriptsDirectory\ci_config.ps1"
+    invoke-webrequest "https://raw.githubusercontent.com/evandrocoan/UnitTesting/master/sbin/ps/utils.ps1" -outfile "$UnitTestingPowerShellScriptsDirectory\utils.ps1"
+    invoke-webrequest "https://raw.githubusercontent.com/evandrocoan/UnitTesting/master/sbin/ps/ci.ps1" -outfile "$UnitTestingPowerShellScriptsDirectory\ci.ps1"
 
     $env:UNITTESTING_BOOTSTRAPPED = 1
 }
