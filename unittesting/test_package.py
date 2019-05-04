@@ -45,6 +45,8 @@ class UnitTestingCommand(sublime_plugin.ApplicationCommand, UnitTestingMixin):
                 raise Exception("DeferrableTestCase is used but `deferred` is `false`.")
 
     def unit_testing(self, stream, package, settings, cleanup_hooks=[]):
+        print('settings:', settings, file=sys.stderr)
+
         if settings["capture_console"]:
             stdout = sys.stdout
             stderr = sys.stderr
@@ -54,7 +56,6 @@ class UnitTestingCommand(sublime_plugin.ApplicationCommand, UnitTestingMixin):
             sys.stdout = StdioSplitter(stdout, stream)
             sys.stderr = StdioSplitter(stderr, stream)
 
-        print('unit_testing, settings:', settings, file=stderr)
         testRunner = None
         progress_bar = ProgressBar("Testing %s" % package)
         progress_bar.start()
