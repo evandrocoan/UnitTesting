@@ -1,6 +1,6 @@
 // SYNTAX TEST "Packages/C++/C.sublime-syntax"
 #pragma once
-// <- source.c meta.preprocessor.c++
+// <- source.c meta.preprocessor.c
  // <- keyword.control.import
 
 // foo
