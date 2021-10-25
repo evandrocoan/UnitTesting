@@ -7,6 +7,8 @@ set -e
 SUBLIME_TEXT_VERSION=${SUBLIME_TEXT_VERSION:-4}
 SUBLIME_TEXT_ARCH=${SUBLIME_TEXT_ARCH:-x64}
 
+FULL_CONSOLE_PATH="$STP/full_console"
+
 if [ $SUBLIME_TEXT_VERSION -ge 4 ]; then
     if [ $(uname) = 'Darwin' ]; then
         STP="$HOME/Library/Application Support/Sublime Text/Packages"
@@ -33,15 +35,87 @@ Bootstrap() {
         CopyTestedPackage
     fi
 
+    DEBUG_TOOLS_PATH="$STP/debugtools"
+    if [ ! -d "$DEBUG_TOOLS_PATH" ]; then
+
+        if [ -z $DEBUG_TOOLS_URL ]; then
+            DEBUG_TOOLS_URL="https://github.com/evandrocoan/debugtools"
+        fi
+
+        if [ ! -z $DEBUG_TOOLS_TAG ]; then
+            DEBUG_TOOLS_TAG="--branch $DEBUG_TOOLS_TAG"
+        fi
+
+        echo "download debugtools tag: $DEBUG_TOOLS_TAG, $DEBUG_TOOLS_URL $DEBUG_TOOLS_PATH"
+        git clone --depth 1 $DEBUG_TOOLS_TAG "$DEBUG_TOOLS_URL" "$DEBUG_TOOLS_PATH"
+        git -C "$DEBUG_TOOLS_PATH" rev-parse HEAD
+        echo
+    fi
+
     local UT_NAME="UnitTesting"
     local UT_PATH="$STP/$UT_NAME"
     if [ ! -d "$UT_PATH" ]; then
-        local UT_TAG=$(getLatestUnitTestingBuildTag \
-            "$UNITTESTING_TAG" "$SUBLIME_TEXT_VERSION" "https://github.com/SublimeText/UnitTesting")
-        InstallPackage "$UT_NAME" "$UT_TAG" "https://github.com/SublimeText/UnitTesting"
+        if [ ! -z $UNITTESTING_TAG ]; then
+            UNITTESTING_TAG="--branch $UNITTESTING_TAG"
+        fi
+        InstallPackage "$UT_NAME" "$UNITTESTING_TAG" "https://github.com/evandrocoan/UnitTesting"
     fi
 
     InstallPackage "coverage" "$COVERAGE_TAG" "https://github.com/codexns/sublime-coverage"
+
+    SublimeTextInstalledPackagesDirectory="$STP/../Installed Packages"
+    fullConsoleDebugToolsFullConsoleOutput="$STP/full_console"
+    fullConsoleDebugToolsFullConsoleScript="$STP/../0_0full_console_output.py"
+    fullConsoleDebugToolsFullConsoleZip="$SublimeTextInstalledPackagesDirectory/0_0full_console_output.zip"
+    fullConsoleDebugToolsFullConsolePackage="$SublimeTextInstalledPackagesDirectory/0_0full_console_output.sublime-package"
+
+    debugToolsConsoleScript="\
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+import os
+import sys
+import time
+import threading
+
+from debugtools.all.debug_tools import getLogger
+log = getLogger('full_console_output', file=r'$fullConsoleDebugToolsFullConsoleOutput', stdout=True)
+
+print('')
+log(1, 'Sublime Text has just started...')
+log(1, 'Starting Capturing the Sublime Text Console...')
+sys.stderr.write('Testing sys.stderr for %s\n' % r'$fullConsoleDebugToolsFullConsoleOutput')
+sys.stdout.write('Testing sys.stdout for %s\n' % r'$fullConsoleDebugToolsFullConsoleOutput')
+
+log(1, 'TESTING!')
+log(1, 'TESTING! logfile to: %s', r'$fullConsoleDebugToolsFullConsoleOutput')
+log(1, 'TESTING! logfile from: %s', os.path.abspath(__file__))
+
+def time_passing():
+
+    while(True):
+        log(1, 'The time is passing...')
+        time.sleep(1)
+
+thread = threading.Thread( target=time_passing )
+thread.start()
+"
+
+    mkdir -p "$SublimeTextInstalledPackagesDirectory"
+
+    printf 'Start capturing all Sublime Text console with debugtools: %s\n' "$fullConsoleDebugToolsFullConsolePackage"
+    printf "%s\n" "$debugToolsConsoleScript" > "$fullConsoleDebugToolsFullConsoleScript"
+    tail -100 "$fullConsoleDebugToolsFullConsoleScript"
+
+    printf 'Create it as Packed file because they are loaded first by Sublime Text\n'
+    zip -v -j "$fullConsoleDebugToolsFullConsoleZip" "$fullConsoleDebugToolsFullConsoleScript"
+
+    printf 'Renaming the zip file to %s\n' "$fullConsoleDebugToolsFullConsolePackage"
+    mv "$fullConsoleDebugToolsFullConsoleZip" "$fullConsoleDebugToolsFullConsolePackage"
+
+    printf '\n'
+    unzip -v "$fullConsoleDebugToolsFullConsolePackage"
+
+    printf '\n'
 
     InstallSublimeText
 
@@ -162,6 +236,40 @@ InstallPackageControl() {
     sh "$STP/UnitTesting/sbin/install_package_control.sh" "--st" "$SUBLIME_TEXT_VERSION"
 }
 
+CloneGitPackage() {
+    if [ -z "$1" ] || [ -z "$2" ]; then
+        echo "ERROR: You must provide an valid git URL $1 and package name $2"
+    fi
+
+    git_url=$1
+    package_name=$2
+    package_full_path="$STP/$package_name"
+
+    if [ -d "$package_full_path" ]; then
+        echo "ERROR: The directory $package_full_path already exists!"
+
+    else
+        echo "download package $package_name: $git_url $package_full_path"
+        git clone --depth 1 "$git_url" "$package_full_path"
+        echo
+    fi
+}
+
+ShowFullSublimeTextConsole() {
+    printf "\n"
+    printf "\n"
+
+    if [ -f "$FULL_CONSOLE_PATH" ]; then
+        printf "Full Sublime Text Console output...\n"
+        printf "%s\n" "$(<$FULL_CONSOLE_PATH)"
+
+    else
+        printf "Log file not found on: %s\n" $FULL_CONSOLE_PATH
+    fi
+
+    exit 1
+}
+
 RunTests() {
     # if [ -n "$(echo "$@" | grep -e '--coverage\b')" ] && [ "$SUBLIME_TEXT_VERSION" -eq 4 ]; then
     #     echo "Coverage is not yet supported in Sublime Text 4"
@@ -184,33 +292,39 @@ shift
 echo "Running command: ${COMMAND} $@"
 case $COMMAND in
     "bootstrap")
-        Bootstrap "$@"
+        Bootstrap "$@" || ShowFullSublimeTextConsole
         ;;
     "copy_tested_package")
-        CopyTestedPackage "$@"
+        CopyTestedPackage "$@" || ShowFullSublimeTextConsole
         ;;
     "install_package")
-        InstallPackage "$@"
+        InstallPackage "$@" || ShowFullSublimeTextConsole
         ;;
     "install_package_control")
-        InstallPackageControl "$@"
+        InstallPackageControl "$@" || ShowFullSublimeTextConsole
         ;;
     "install_color_scheme_unit")
-        InstallColorSchemeUnit "$@"
+        InstallColorSchemeUnit "$@" || ShowFullSublimeTextConsole
         ;;
     "install_keypress")
-        InstallKeypress "$@"
+        InstallKeypress "$@" || ShowFullSublimeTextConsole
         ;;
     "run_tests")
-        RunTests "$@"
+        RunTests "$@" || ShowFullSublimeTextConsole
         ;;
     "run_syntax_tests")
-        RunTests "--syntax-test" "$@"
+        RunTests "--syntax-test" "$@" || ShowFullSublimeTextConsole
         ;;
     "run_syntax_compatibility")
-        RunTests "--syntax-compatibility" "$@"
+        RunTests "--syntax-compatibility" "$@" || ShowFullSublimeTextConsole
         ;;
     "run_color_scheme_tests")
-        RunTests "--color-scheme-test" "$@"
+        RunTests "--color-scheme-test" "$@" || ShowFullSublimeTextConsole
+        ;;
+    "clone_git_package")
+        CloneGitPackage "$@" || ShowFullSublimeTextConsole
+        ;;
+    "show_full_sublime_text_console")
+        ShowFullSublimeTextConsole "$@"
         ;;
 esac

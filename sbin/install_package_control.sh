@@ -41,16 +41,23 @@ if [ ! -d "$STIP" ]; then
     mkdir -p "$STIP"
 fi
 
-PC_PATH="$STIP/Package Control.sublime-package"
-if [ ! -f "$PC_PATH" ]; then
-    PC_URL="https://packagecontrol.io/Package%20Control.sublime-package"
-    curl -s -L "$PC_URL" -o "$PC_PATH"
+git_url="https://github.com/evandrocoan/PackagesManager"
+package_name="PackagesManager"
+package_full_path="$STP/$package_name"
+
+if [ -d "$package_full_path" ]; then
+    echo "ERROR: The directory $package_full_path already exists!"
+
+else
+    echo "download package $package_name: $git_url $package_full_path"
+    git clone --depth 1 "$git_url" "$package_full_path"
+    echo
 fi
 
-if [ ! -f "$STP/User/Package Control.sublime-settings" ]; then
-    echo creating Package Control.sublime-settings
-    # make sure Pakcage Control does not complain
-    echo '{"ignore_vcs_packages": true }' > "$STP/User/Package Control.sublime-settings"
+if [ ! -f "$STP/User/PackagesManager.sublime-settings" ]; then
+    echo creating PackagesManager.sublime-settings
+    # make sure PackagesManager does not complain
+    echo '{"ignore_vcs_packages": true }' > "$STP/User/PackagesManager.sublime-settings"
 fi
 
 PCH_PATH="$STP/0_install_package_control_helper"
@@ -67,8 +74,9 @@ for i in {1..3}; do
     subl &
 
     ENDTIME=$(( $(date +%s) + 60 ))
-    while [ ! -f "$PCH_PATH/success" ] && [ $(date +%s) -lt $ENDTIME ]  ; do
-        printf "."
+    printf "Checking if Sublime Text has started and PackagesManager has ran.\n"
+    while [ ! -f "$PCH_PATH/success" ] && [ $(date +%s) -lt $ENDTIME ] ; do
+        printf "The time limit is on $(date +%s) of $ENDTIME...\n"
         sleep 5
     done
 
@@ -78,12 +86,14 @@ for i in {1..3}; do
     [ -f "$PCH_PATH/success" ] && break
 done
 
+if [ -f "$PCH_PATH/log" ]; then
+    cat "$PCH_PATH/log"
+else
+    echo "Log file not found on: $PCH_PATH/log"
+fi
+
 if [ ! -f "$PCH_PATH/success" ]; then
-    if [ -f "$PCH_PATH/log" ]; then
-        cat "$PCH_PATH/log"
-    fi
-    echo "Timeout: Fail to install Package Control."
-    rm -rf "$PCH_PATH"
+    echo "Timeout: Fail to install PackagesManager."
     exit 1
 fi
 

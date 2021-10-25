@@ -11,7 +11,7 @@ class UnitTestingCurrentPackageCommand(UnitTestingCommand):
     def run(self, **kwargs):
         project_name = self.current_package_name
         if not project_name:
-            sublime.message_dialog("Cannot determine package name.")
+            sublime.message_dialog("UnitTesting Package: Cannot determine package name.")
             return
 
         kwargs["package"] = project_name
@@ -32,7 +32,7 @@ class UnitTestingCurrentFileCommand(UnitTestingCommand):
     def run(self, **kwargs):
         project_name = self.current_package_name
         if not project_name:
-            sublime.message_dialog("Cannot determine package name.")
+            sublime.message_dialog("UnitTesting Package: Cannot determine package name.")
             return
 
         window = sublime.active_window()
@@ -74,7 +74,7 @@ class UnitTestingCurrentPackageCoverageCommand(UnitTestingCoverageCommand):
     def run(self, **kwargs):
         project_name = self.current_package_name
         if not project_name:
-            sublime.message_dialog("Cannot determine package name.")
+            sublime.message_dialog("UnitTesting Package: Cannot determine package name.")
             return
 
         kwargs["package"] = project_name

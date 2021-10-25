@@ -6,14 +6,20 @@ import os
 
 def plugin_loaded():
 
-    pc_settings = sublime.load_settings("Package Control.sublime-settings")
+    pc_settings = sublime.load_settings("PackagesManager.sublime-settings")
 
     logfile = os.path.join(
         sublime.packages_path(),
         "0_install_package_control_helper",
         "log")
 
+    def write_message(message):
+        with open(logfile, "a") as f:
+            f.write("%s\n" % message)
+
     def kill_subl(restart=False):
+        write_message('kill_subl')
+
         if sublime.platform() == "osx":
             cmd = "sleep 1; pkill [Ss]ubl; pkill plugin_host; sleep 1; "
             if restart:
@@ -30,6 +36,7 @@ def plugin_loaded():
         subprocess.Popen(cmd, shell=True)
 
     def touch(file_name):
+        write_message('touching %s' % file_name)
         f = os.path.join(
             sublime.packages_path(),
             "0_install_package_control_helper",
@@ -44,8 +51,8 @@ def plugin_loaded():
             sublime.set_timeout(check_bootstrap, 5000)
 
     def check_dependencies():
-        if 'Package Control' in sys.modules:
-            package_control = sys.modules['Package Control'].package_control
+        if 'PackagesManager' in sys.modules:
+            package_control = sys.modules['PackagesManager'].package_control
         else:
             sublime.set_timeout(check_dependencies, 5000)
             return
@@ -62,9 +69,9 @@ def plugin_loaded():
                     touch("success")
                     kill_subl()
                 else:
-                    with open(logfile, "a") as f:
-                        f.write("missing dependencies:" + "\n")
-                        f.write(" ".join(missing_dependencies) + "\n")
+                    write_message("Unit Testing pc_helper(), missing dependencies: %s" % missing_dependencies)
+                    write_message("required_dependencies: %s" % required_dependencies)
+                    write_message("found_dependencies: %s" % found_dependencies)
                     sublime.set_timeout(_check_dependencies, 5000)
 
         def _check_dependencies():
@@ -80,9 +87,8 @@ def plugin_loaded():
     else:
         # restart sublime when `sublime.error_message` is run
         def error_message(message):
-            with open(logfile, "a") as f:
-                f.write(message + "\n")
-
+            write_message('Running sublime.error_message')
+            write_message(message)
             kill_subl(True)
 
         sublime.error_message = error_message

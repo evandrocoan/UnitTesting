@@ -51,6 +51,7 @@ __all__ = [
 
 def plugin_loaded():
     if sys.version_info >= (3, 8):
+        return
         UT33 = os.path.join(sublime.packages_path(), "UnitTesting33")
         if not os.path.exists(UT33):
             os.makedirs(UT33)
@@ -63,6 +64,7 @@ def plugin_loaded():
 
 def plugin_unloaded():
     if sys.version_info >= (3, 8):
+        return
         UT33 = os.path.join(sublime.packages_path(), "UnitTesting33")
         try:
             from AutomaticPackageReloader.package_reloader import reload_lock

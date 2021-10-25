@@ -50,11 +50,17 @@ class OutputPanel:
             while self.text_queue:
                 text += self.text_queue.popleft()
 
+        self.output_view.set_read_only(False)
         self.output_view.run_command(
             'append',
             {'characters': text, 'force': True}
         )
-        self.output_view.show(self.output_view.size())
+        # Allow the user to edit the output panel contents
+        # self.output_view.set_read_only(True)
+
+        # Allow the user to scroll up when the build is running. Note: Sublime Text already scrolls
+        # for you, automatically and allows you to freely scroll up when needed!
+        # self.output_view.show(self.output_view.size())
 
     def flush(self):
         self._write()

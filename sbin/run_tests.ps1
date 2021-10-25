@@ -22,10 +22,28 @@ new-variable -name 'UTF8Encoding' -option CONSTANT -scope 'script' `
 $packagesPath = 'C:\st\Data\Packages'
 $stPath = 'C:\st\sublime_text.exe'
 
+$fullConsole = "$packagesPath\full_console"
 $outDir = "$packagesPath\User\UnitTesting\$PackageToTest"
 $outFile = "$outDir\result"
 $coverageFile = "$outDir\coverage"
 [void] (new-item -itemtype file $outFile -force)
+
+function displayTheFullConsoleFile() {
+    logVerbose ""
+    logVerbose ""
+
+    if (test-path "$fullConsole") {
+        $copy = "$fullConsole.copy"
+        copy-item $fullConsole -Destination $copy -force
+
+        logVerbose "Full Sublime Text Console output..."
+        $lines = (get-content $copy)
+        write-output $lines
+    } else {
+        write-verbose "Log file not found on: $fullConsole"
+    }
+}
+
 remove-item $outFile -force -erroraction silentlycontinue
 
 $schedule_source = "$packagesPath\UnitTesting\sbin\run_scheduler.py"
@@ -112,6 +130,8 @@ write-verbose "start to read output"
 $copy = "$outfile.copy"
 $read = 0
 $done = $false
+$startTime = get-date
+
 while ($true) {
     # XXX(guillermooo): We can't open a file already opened by another
     # process. By copying the file first, we can work around this. (But if
@@ -120,6 +140,11 @@ while ($true) {
     # from an already opened file. Perhaps it uses the same workaround as we
     # do here?
     copy-item $outfile $copy -force
+
+    # Bail out if more than 10 minutes passed
+    if (((get-date) - $startTime).totalseconds -ge 1000) {
+        break
+    }
 
     $lines = (get-content $copy)
     $lines = $lines | select-object -skip $read
@@ -159,6 +184,10 @@ if (test-path $schedule_target) {
     remove-item $schedule_target -force
 }
 
+displayTheFullConsoleFile
+
 if (!$success) {
-    throw
+    write-output ""
+    write-output ""
+    throw "The Unit Texts execution was not successful!"
 }

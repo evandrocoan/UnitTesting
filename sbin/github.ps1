@@ -28,7 +28,7 @@ function downloadScriptIfNotExist {
         $tag = "master"
     }
     if (-Not (Test-Path (join-path $UnitTestingPowerShellScriptsDirectory $FileName))) {
-        invoke-webrequest "https://raw.githubusercontent.com/SublimeText/UnitTesting/$tag/sbin/ps/$FileName" -outfile "$UnitTestingPowerShellScriptsDirectory\$FileName"
+        invoke-webrequest "https://raw.githubusercontent.com/evandrocoan/UnitTesting/$tag/sbin/ps/$FileName" -outfile "$UnitTestingPowerShellScriptsDirectory\$FileName"
     }
 }
 
