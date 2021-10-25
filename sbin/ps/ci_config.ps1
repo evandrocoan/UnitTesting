@@ -50,6 +50,7 @@ if (!$env:UNITTESTING_BOOTSTRAPPED) {
     makeGlobalConstant SublimeTextExecutablePath (join-path $SublimeTextDirectory 'sublime_text.exe')
     # The path to the Sublime Text Packages directory.
     makeGlobalConstant SublimeTextPackagesDirectory (eitherOr $env:SUBLIME_TEXT_PACKAGES_DIRECTORY (join-path $SublimeTextDirectory "Data\Packages"))
+    makeGlobalConstant SublimeTextInstalledPackagesDirectory (eitherOr $env:SUBLIME_TEXT_INSTALLED_PACKAGES_DIRECTORY (join-path $SublimeTextDirectory "Data\Installed Packages"))
     # TODO: For compatibility; remove when not used anymore.
     $global:STP = $SublimeTextPackagesDirectory
 
@@ -64,9 +65,11 @@ if (!$env:UNITTESTING_BOOTSTRAPPED) {
     makeGlobalConstant ColorSchemeUnitSublimeTextPackagesDirectory (join-path $SublimeTextPackagesDirectory 'ColorSchemeUnit')
     makeGlobalConstant CoverageRepositoryUrl "https://github.com/codexns/sublime-coverage"
     makeGlobalConstant CoverageSublimeTextPackagesDirectory (join-path $SublimeTextPackagesDirectory 'coverage')
+    makeGlobalConstant DebugToolsRepositoryUrl "https://github.com/evandrocoan/debugtools"
+    makeGlobalConstant DebugToolsSublimeTextPackagesDirectory (join-path $SublimeTextPackagesDirectory 'debugtools')
     makeGlobalConstant KeyPressRepositoryUrl "https://github.com/randy3k/Keypress"
     makeGlobalConstant KeyPressSublimeTextPackagesDirectory (join-path $SublimeTextPackagesDirectory 'Keypress')
-    makeGlobalConstant UnitTestingRepositoryUrl "https://github.com/SublimeText/UnitTesting"
+    makeGlobalConstant UnitTestingRepositoryUrl "https://github.com/evandroforks/UnitTesting"
     makeGlobalConstant UnitTestingSublimeTextPackagesDirectory (join-path $SublimeTextPackagesDirectory 'UnitTesting')
 
     # TODO: Is this specific to the CI service?

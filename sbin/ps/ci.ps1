@@ -29,9 +29,16 @@ use it.
 param(
     [Parameter(Position=0, Mandatory=$true)]
     [ValidateSet('bootstrap', 'install_package_control', 'install_color_scheme_unit',
-        'install_keypress', 'run_tests', 'run_syntax_tests', 'run_syntax_compatibility', 'run_color_scheme_tests')]
+        'install_keypress', 'run_tests', 'run_syntax_tests', 'run_syntax_compatibility',
+        'run_color_scheme_tests', 'clone_git_package')]
     [string]$command,
-    [switch]$coverage
+    [switch]$coverage,
+    [Parameter(Mandatory = $false, Position = 1)]
+    [string]$package_url,
+    [Parameter(Mandatory = $false, Position = 2)]
+    [string]$package_name,
+    [Parameter(Mandatory = $false, Position = 3)]
+    [string]$package_tag
 )
 
 # Stop execution on any error. PS default is to continue on non-terminating errors.
@@ -44,7 +51,7 @@ if (!$UnitTestingPowerShellScriptsDirectory) {
 function downloadScriptIfNotExist {
     param([string]$FileName)
     if (-Not (Test-Path (join-path $UnitTestingPowerShellScriptsDirectory $FileName))) {
-        invoke-webrequest "https://raw.githubusercontent.com/SublimeText/UnitTesting/master/sbin/ps/$FileName" -outfile "$UnitTestingPowerShellScriptsDirectory\$FileName"
+        invoke-webrequest "https://raw.githubusercontent.com/evandrocoan/UnitTesting/master/sbin/ps/$FileName" -outfile "$UnitTestingPowerShellScriptsDirectory\$FileName"
     }
 }
 
@@ -59,8 +66,45 @@ if (!$env:UNITTESTING_BOOTSTRAPPED) {
 . $UnitTestingPowerShellScriptsDirectory\ci_config.ps1
 . $UnitTestingPowerShellScriptsDirectory\utils.ps1
 
+$fullConsoleDebugToolsFullConsoleOutput = "$SublimeTextPackagesDirectory\full_console"
+$fullConsoleDebugToolsFullConsoleScript = "$SublimeTextDirectory\0_0full_console_output.py"
+$fullConsoleDebugToolsFullConsoleZip = "$SublimeTextInstalledPackagesDirectory\0_0full_console_output.zip"
+$fullConsoleDebugToolsFullConsolePackage = "0_0full_console_output.sublime-package"
+
+$debugToolsConsoleScript = @"
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+import os
+import sys
+import time
+import threading
+
+from debugtools.all.debug_tools import getLogger
+log = getLogger('full_console_output', file=r'$fullConsoleDebugToolsFullConsoleOutput', stdout=True)
+
+print('')
+log(1, 'Sublime Text has just started...')
+log(1, 'Starting Capturing the Sublime Text Console...')
+sys.stderr.write('Testing sys.stderr for %s\n' % r'$fullConsoleDebugToolsFullConsoleOutput')
+sys.stdout.write('Testing sys.stdout for %s\n' % r'$fullConsoleDebugToolsFullConsoleOutput')
+
+log(1, 'TESTING!')
+log(1, 'TESTING! logfile to: %s', r'$fullConsoleDebugToolsFullConsoleOutput')
+log(1, 'TESTING! logfile from: %s', os.path.abspath(__file__))
+
+def time_passing():
+
+    while(True):
+        log(1, 'The time is passing...')
+        time.sleep(1)
+
+thread = threading.Thread( target=time_passing )
+thread.start()
+"@
+
 function Bootstrap {
     ensureCreateDirectory $SublimeTextPackagesDirectory
+    ensureCreateDirectory $SublimeTextInstalledPackagesDirectory
 
     # Copy plugin files to Packages/<Package> folder.
     logVerbose "creating directory junction to package under test at $PackageUnderTestSublimeTextPackagesDirectory..."
@@ -68,14 +112,39 @@ function Bootstrap {
 
     # Clone UnitTesting into Packages/UnitTesting.
     if (pathExists -Negate $UnitTestingSublimeTextPackagesDirectory) {
-        $UNITTESTING_TAG = getLatestUnitTestingBuildTag $env:UNITTESTING_TAG $SublimeTextVersion $UnitTestingRepositoryUrl
-        logVerbose "download UnitTesting tag: $UNITTESTING_TAG"
-        gitCloneTag $UNITTESTING_TAG $UnitTestingRepositoryUrl $UnitTestingSublimeTextPackagesDirectory
+        # $UNITTESTING_TAG = getLatestUnitTestingBuildTag $env:UNITTESTING_TAG $SublimeTextVersion $UnitTestingRepositoryUrl
+        # logVerbose "download UnitTesting tag: $UNITTESTING_TAG"
+        # gitCloneTag $UNITTESTING_TAG $UnitTestingRepositoryUrl $UnitTestingSublimeTextPackagesDirectory
+        logVerbose "download UnitTesting: $UnitTestingRepositoryUrl $UnitTestingSublimeTextPackagesDirectory $env:UNITTESTING_TAG"
+        cloneRepository $UnitTestingRepositoryUrl $UnitTestingSublimeTextPackagesDirectory $env:UNITTESTING_TAG
+        logVerbose "SUCCESSFULLY CLONED UNITTESTING!"
         gitGetHeadRevisionName $UnitTestingSublimeTextPackagesDirectory | logVerbose
         logVerbose ""
     }
 
     # Clone coverage plugin into Packages/coverage.
+    installPackageForSublimeTextIfNotPresent $CoverageSublimeTextPackagesDirectory $env:COVERAGE_TAG $CoverageRepositoryUrl
+
+    # Clone debugtools into Packages/debugtools.
+    if (pathExists -Negate $DebugToolsSublimeTextPackagesDirectory) {
+        logVerbose "download debugtools: $DebugToolsRepositoryUrl $DebugToolsSublimeTextPackagesDirectory $env:DEBUG_TOOLS_TAG"
+        cloneRepository $DebugToolsRepositoryUrl $DebugToolsSublimeTextPackagesDirectory $env:DEBUG_TOOLS_TAG
+        logVerbose "SUCCESSFULLY CLONED DEBUG TOOLS!"
+        gitGetHeadRevisionName $DebugToolsSublimeTextPackagesDirectory | logVerbose
+        logVerbose ""
+    }
+
+    logVerbose "Start capturing all Sublime Text console with debugtools"
+    "$debugToolsConsoleScript" | Out-File -FilePath "$fullConsoleDebugToolsFullConsoleScript" -Encoding ASCII
+
+    logVerbose "Create it as Packed file because they are loaded first by Sublime Text"
+    Compress-Archive -Path "$fullConsoleDebugToolsFullConsoleScript" -DestinationPath "$fullConsoleDebugToolsFullConsoleZip" -CompressionLevel Optimal -Force
+
+    logVerbose "Renaming the zip file to $fullConsoleDebugToolsFullConsolePackage"
+    Rename-Item "$fullConsoleDebugToolsFullConsoleZip" -NewName "$fullConsoleDebugToolsFullConsolePackage"
+
+    logVerbose ""
+    logVerbose "Clone coverage plugin into Packages/coverage"
     installPackageForSublimeTextIfNotPresent $CoverageSublimeTextPackagesDirectory $env:COVERAGE_TAG $CoverageRepositoryUrl
 
     & "$UnitTestingSublimeTextPackagesDirectory\sbin\install_sublime_text.ps1" -verbose
@@ -92,7 +161,6 @@ function InstallPackage {
 }
 
 function InstallPackageControl {
-    remove-item $CoverageSublimeTextPackagesDirectory -Force -Recurse
     & "$UnitTestingSublimeTextPackagesDirectory\sbin\install_package_control.ps1" -verbose
 }
 
@@ -120,6 +188,14 @@ function RunTests {
     start-sleep -seconds 2
 }
 
+function CloneGitPackage {
+    $PACKAGE_PATH = "$SublimeTextPackagesDirectory\$package_name"
+    logVerbose "Downloading package: $package_url $PACKAGE_PATH $package_tag"
+
+    cloneRepository $package_url "$PACKAGE_PATH" $package_tag
+    logVerbose ""
+}
+
 switch ($command){
     'bootstrap' { Bootstrap }
     'install_package' { InstallPackage }
@@ -130,4 +206,5 @@ switch ($command){
     'run_syntax_tests' { RunTests -syntax_test }
     'run_syntax_compatibility' { RunTests -syntax_compatibility }
     'run_color_scheme_tests' { RunTests -color_scheme_test }
+    'clone_git_package' { CloneGitPackage }
 }

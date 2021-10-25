@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/bin/sh
 
 set -e
 
@@ -159,6 +159,8 @@ else
         ln -sf "$HOME/$SUBLIME_TEXT/sublime_text" $HOME/.local/bin/subl
 
         # make `subl` available
+        echo "Successfully installed Sublime Text"
+        echo
         "$HOME/$SUBLIME_TEXT/sublime_text" &
         sleep 2
         pkill '[Ss]ubl' || true

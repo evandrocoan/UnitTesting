@@ -28,7 +28,7 @@ function downloadScriptIfNotExist {
         $tag = "master"
     }
     if (-Not (Test-Path (join-path $UnitTestingPowerShellScriptsDirectory $FileName))) {
-        (new-object net.webclient).DownloadFile("https://raw.githubusercontent.com/SublimeText/UnitTesting/master/sbin/ps/$FileName", "$UnitTestingPowerShellScriptsDirectory\$FileName")
+        (new-object net.webclient).DownloadFile("https://raw.githubusercontent.com/evandrocoan/UnitTesting/master/sbin/ps/$FileName", "$UnitTestingPowerShellScriptsDirectory\$FileName")
     }
 }
 

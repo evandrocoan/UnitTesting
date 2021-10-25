@@ -20,9 +20,63 @@ There is no plan to remove the corresponding scripts from the repo in a near fut
 Sublime Text 4 is now supported. However test coverage on Python 3.8 packages is still not working now.
 
 
+
+## Installation
+
+### By Package Control
+
+1. Download & Install **`Sublime Text 3`** (https://www.sublimetext.com/3)
+1. Go to the menu **`Tools -> Install Package Control`**, then,
+    wait few seconds until the installation finishes up
+1. Now,
+    Go to the menu **`Preferences -> Package Control`**
+1. Type **`Add Channel`** on the opened quick panel and press <kbd>Enter</kbd>
+1. Then,
+    input the following address and press <kbd>Enter</kbd>
+    ```
+    https://raw.githubusercontent.com/evandrocoan/StudioChannel/master/channel.json
+    ```
+1. Go to the menu **`Tools -> Command Palette...
+    (Ctrl+Shift+P)`**
+1. Type **`Preferences:
+    Package Control Settings – User`** on the opened quick panel and press <kbd>Enter</kbd>
+1. Then,
+    find the following setting on your **`Package Control.sublime-settings`** file:
+    ```js
+    "channels":
+    [
+        "https://packagecontrol.io/channel_v3.json",
+        "https://raw.githubusercontent.com/evandrocoan/StudioChannel/master/channel.json",
+    ],
+    ```
+1. And,
+    change it to the following, i.e.,
+    put the **`https://raw.githubusercontent...`** line as first:
+    ```js
+    "channels":
+    [
+        "https://raw.githubusercontent.com/evandrocoan/StudioChannel/master/channel.json",
+        "https://packagecontrol.io/channel_v3.json",
+    ],
+    ```
+    * The **`https://raw.githubusercontent...`** line must to be added before the **`https://packagecontrol.io...`** one, otherwise,
+      you will not install this forked version of the package,
+      but the original available on the Package Control default channel **`https://packagecontrol.io...`**
+1. Now,
+    go to the menu **`Preferences -> Package Control`**
+1. Type **`Install Package`** on the opened quick panel and press <kbd>Enter</kbd>
+1. Then,
+    search for **`UnitTesting`** and press <kbd>Enter</kbd>
+
+See also:
+
+1. [ITE - Integrated Toolset Environment](https://github.com/evandrocoan/ITE)
+1. [Package control docs](https://packagecontrol.io/docs/usage) for details.
+
+
 ## Preparation
 
-1. Before testing anything, you have to install [UnitTesting](https://github.com/SublimeText/UnitTesting) via Package Control.
+1. Before testing anything, you have to install UnitTesting via Package Control.
 2. Your package!
 3. TestCases should be placed in `test*.py` under the directory `tests` (configurable, see below). The testcases are then loaded by [TestLoader.discover](https://docs.python.org/3.3/library/unittest.html#unittest.TestLoader.discover).
 

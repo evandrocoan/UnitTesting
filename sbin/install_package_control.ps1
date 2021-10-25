@@ -8,14 +8,19 @@ try{
     $STIP = "C:\st\Data\Installed Packages"
     New-Item -itemtype directory $STIP -force >$null
 
-    $PC_PATH = "$STIP\Package Control.sublime-package"
-    $PC_URL = "https://packagecontrol.io/Package Control.sublime-package"
-    (New-Object System.Net.WebClient).DownloadFile($PC_URL, $PC_PATH)
+    $PACKAGE_CONTROL_PATH = "$STP\PackagesManager"
+    if (!(test-path -path "$PACKAGE_CONTROL_PATH")){
+        $PACKAGE_CONTROL_URL = "https://github.com/evandrocoan/PackagesManager"
 
-    $PC_SETTINGS = "C:\st\Data\Packages\User\Package Control.sublime-settings"
+        write-verbose "download PackagesManager package: $UNITTESTING_TAG"
+        git clone --quiet --depth 1 $PACKAGE_CONTROL_URL "$PACKAGE_CONTROL_PATH" 2>$null
+        write-verbose ""
+    }
+
+    $PC_SETTINGS = "C:\st\Data\Packages\User\PackagesManager.sublime-settings"
 
     if (-not (test-path $PC_SETTINGS)) {
-        write-verbose "creating Package Control.sublime-settings"
+        write-verbose "creating PackagesManager.sublime-settings"
         "{`"ignore_vcs_packages`": true }" | out-file -filepath $PC_SETTINGS -encoding ascii
     }
 
@@ -41,12 +46,14 @@ try{
         }
     }
 
+    if (test-path "$PCH_PATH\log") {
+        get-content -Path "$PCH_PATH\log"
+    } else {
+        write-verbose "Log file not found on: $PCH_PATH\log"
+    }
+
     if (-not (test-path "$PCH_PATH\success")) {
-        if (test-path "$PCH_PATH\log") {
-            get-content -Path "$PCH_PATH\log"
-        }
-        remove-item "$PCH_PATH" -Recurse -Force
-        throw "Timeout: Fail to install Package Control."
+        throw "Timeout: Fail to install PackagesManager."
     }
 
     remove-item "$PCH_PATH" -Recurse -Force

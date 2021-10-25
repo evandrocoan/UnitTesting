@@ -3,9 +3,16 @@
 param(
     [Parameter(Mandatory = $false, Position = 0)]
     [string]$command,
+    [Parameter(Mandatory = $false, Position = 1)]
+    [string]$package_url,
+    [Parameter(Mandatory = $false, Position = 2)]
+    [string]$package_name,
     [Parameter(Mandatory = $false)]
     [switch] $coverage
 )
+
+# Enable debug mode as the cmd `@echo on`
+# Set-PSDebug -Trace 1
 
 $ErrorActionPreference = 'stop'
 
@@ -28,7 +35,7 @@ function downloadScriptIfNotExist {
         $tag = "master"
     }
     if (-Not (Test-Path (join-path $UnitTestingPowerShellScriptsDirectory $FileName))) {
-        (new-object net.webclient).DownloadFile("https://raw.githubusercontent.com/SublimeText/UnitTesting/$tag/sbin/ps/$FileName", "$UnitTestingPowerShellScriptsDirectory\$FileName")
+        (new-object net.webclient).DownloadFile("https://raw.githubusercontent.com/evandrocoan/UnitTesting/$tag/sbin/ps/$FileName", "$UnitTestingPowerShellScriptsDirectory\$FileName")
     }
 }
 
